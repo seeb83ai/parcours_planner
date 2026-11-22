@@ -62,6 +62,22 @@ input, textarea { border: 1px solid var(--line); border-radius: 8px; padding: 6p
 .flag.warn { background: var(--warn); color: #fff; }
 
 #print-area { display: none; }
+
+.help-btn { font-weight: 700; width: 34px; border-radius: 50%; padding: 6px 0; }
+.help { max-width: 640px; width: calc(100% - 32px); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; color: var(--ink); background: var(--card); }
+.help::backdrop { background: rgba(17, 24, 39, 0.45); }
+.help h2 { font-size: 20px; text-transform: none; letter-spacing: 0; color: var(--accent); margin: 0 32px 12px 0; }
+.help h3 { font-family: 'Space Grotesk', Inter, sans-serif; font-size: 15px; margin: 16px 0 6px; }
+.help dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; }
+.help dt { font-weight: 700; }
+.help dd { margin: 0; line-height: 1.45; }
+.help table { border-collapse: collapse; width: 100%; }
+.help td { padding: 5px 8px 5px 0; border-top: 1px solid var(--line); vertical-align: top; }
+.help td:first-child { white-space: nowrap; width: 1%; }
+.help kbd { font: 600 12px Inter, system-ui, sans-serif; background: var(--bg); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 2px 6px; }
+.help form { position: absolute; top: 14px; right: 14px; margin: 0; }
+.help-close { border: 0; font-size: 16px; padding: 4px 8px; }
+@media (max-width: 560px) { .help dl { grid-template-columns: 1fr; } .help dd { margin-bottom: 6px; } }
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .center { order: -1; } }
 @page { size: A4 portrait; margin: 0; }
 @media print {

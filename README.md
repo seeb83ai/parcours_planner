@@ -43,12 +43,13 @@ Quick start:
 | Ctrl + drag (Cmd on a Mac) | Rotate freely in 15° steps |
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Esc | Clear the selection |
+| ? | Open the help (also the **?** button at the top) |
 
 ## Deploy
 
 All paths are relative, so you can serve the folder from any web server:
 
-- **GitHub Pages:** in Settings → Pages, set the source to the `main` branch and the root folder.
+- **GitHub Pages:** the workflow `.github/workflows/ci.yml` runs the tests on every push and pull request. It deploys `main` to Pages only when the tests pass. In Settings → Pages, set the source to **GitHub Actions**.
 - **nginx (for example on a Raspberry Pi):** copy the files into the web root, or point a `location` at the folder. No other set-up is necessary.
 
 ## Development

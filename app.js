@@ -368,7 +368,10 @@ $('btn-undo').addEventListener('click', () => restore(undo, redo));
 $('btn-redo').addEventListener('click', () => restore(redo, undo));
 $('lang').addEventListener('change', e => { setLang(e.target.value); renderAll(); });
 
+$('btn-help').addEventListener('click', () => $('help').showModal());
+
 document.addEventListener('keydown', e => {
+  if ($('help').open) return; // the dialog handles Esc itself; keep the editor still behind it
   const typing = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
   const mod = e.ctrlKey || e.metaKey;
   if (mod && !typing && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? restore(redo, undo) : restore(undo, redo); }
@@ -377,6 +380,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Delete' || e.key === 'Backspace') selAction('delete');
   else if (e.key === 'r') selAction('rotate');
   else if (e.key === 'Escape') { sel = {}; renderCourt(); markList(); }
+  else if (e.key === '?') $('help').showModal();
 });
 
 $('lang').value = getLang();
