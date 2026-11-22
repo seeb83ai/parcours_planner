@@ -327,7 +327,10 @@ function applyMove(d, q, dx, dy, exact) {
   const sn = exact ? r3 : M.snap;
   const local = (x, y) => { const l = M.toLocal(L.frame, x, y); return { u: r3(sn(l.u)), v: r3(sn(l.v)) }; };
   if (kind === 'free') Object.assign(P.free[i], { x: sn(O.free[i].x + dx), y: sn(O.free[i].y + dy) });
-  if (kind === 'start') P.start = { x: sn(O.start.x + dx), y: sn(O.start.y + dy) };
+  if (kind === 'start') { // the start box sits on the lane: the stations follow it clockwise
+    const q = M.project({ x: sn(O.start.x + dx), y: sn(O.start.y + dy) }, M.geom(M.hallOf(P))).pt;
+    P.start = { x: r3(q.x), y: r3(q.y) };
+  }
   if (kind === 'item') {
     // moving any place's copy moves the base item, so all places stay identical
     const { du, dv } = M.spotOffsets(stO)[d.k] || { du: 0, dv: 0 };

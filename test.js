@@ -11,6 +11,8 @@ const P = stations => ({ ...M.emptyParcours(), stations });
 const near = (a, b) => Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6;
 { const e = M.emptyParcours(), c = M.connectors(e, M.layout(e));
   check('empty parcours: run from start to finish goes around the lane', c.length === 1 && c[0].pts.length >= 5); }
+{ const e = { ...M.emptyParcours(), start: { x: 20, y: M.INSET }, stations: [st('kaenguru'), st('zielwurf'), st('kaenguru')] }, l = M.layout(e);
+  check('moved start: stations follow it clockwise', l[0].side === 0 && l[0].frame.x > 22 - 1e-6 && l[1].goal && l[1].side === 1 && l[2].side === 2); }
 check('badge caption wraps at spaces, two lines at most', JSON.stringify(caption('Sprungwurf über die Bank')) === '["Sprungwurf über","die Bank"]'
   && JSON.stringify(caption('Luftballon hochhalten und fangen')) === '["Luftballon","hochhalten und…"]' && caption('Wackelberg').length === 1);
 

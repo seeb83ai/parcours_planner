@@ -1,6 +1,6 @@
 // SVG rendering in metres: the court with all stations, and the A4 portrait print page.
 import { layout, connectors, toWorld, itemU, ITEM_TYPES, START_LEN, material, span, spotOffsets,
-  placedItems, badges, crossings, geom, hallOf, circuit } from './model.js';
+  placedItems, badges, crossings, geom, hallOf, circuit, startFrame } from './model.js';
 
 const COL = {
   floor: '#f3e9d6', line: '#a8977a', run: '#0f766e', throw: '#c2410c', ink: '#111827', start: '#15803d',
@@ -160,7 +160,7 @@ export function courtInner(p, opts) {
  rx="0.4" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="0.07" stroke-dasharray="0.3 0.2" style="cursor:move"/>`);
   }
   // start (not in circuit mode: groups begin at their station)
-  if (!zirkel) o.push(`<g ${edit ? `data-drag="start" ${cur(true)}` : ''}><rect x="${n(p.start.x - START_LEN / 2)}" y="${n(p.start.y - 0.6)}" width="${START_LEN}" height="1.2" rx="0.3" fill="${COL.start}"/>`
+  if (!zirkel) o.push(`<g ${edit ? `data-drag="start" ${cur(true)}` : ''} transform="rotate(${startFrame(p).rot % 180} ${n(p.start.x)} ${n(p.start.y)})"><rect x="${n(p.start.x - START_LEN / 2)}" y="${n(p.start.y - 0.6)}" width="${START_LEN}" height="1.2" rx="0.3" fill="${COL.start}"/>`
     + `<text x="${n(p.start.x)}" y="${n(p.start.y + 0.2)}" text-anchor="middle" font-size="0.55" font-weight="700" fill="#fff">${esc(t('start'))}</text></g>`);
   // items
   p.free.forEach((it, j) => o.push(placed(it, it, it.rot || 0, edit ? `data-drag="free" data-i="${j}" ${cur(sel.free === j)}` : '', edit, sel.free === j, t)));

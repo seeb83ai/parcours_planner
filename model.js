@@ -100,51 +100,60 @@ export function resize(st, len) {
 
 // Place every station. Returns one entry per station:
 // { fits, frame, entry, exit, side, goal?, pinned? }
+// The lane is laid out clockwise from the start box: a list of segments (rest of the start side, the
+// other three sides, the start side up to the finish), measured in metres `r` after the start exit.
 export function layout(p) {
   const G = geom(hallOf(p)), S = G.sides;
-  let side = 0, pos = START_LEN;
+  const s0 = project(startExit(p), G).s, rel = s => (((s - s0) % G.lap) + G.lap) % G.lap;
+  const end = rel(project(finishPoint(p), G).s) - GAP; // keep the gap before the finish free
+  const segs = [];
+  for (let k = 0, off = 0; k < 4; off += S[k].len, k++) if (s0 >= off - 1e-9 && s0 < off + S[k].len + 1e-9) {
+    for (let r = 0, u = s0 - off, i = 0; r < end - 1e-9 && i < 5; i++, k = (k + 1) % 4, u = 0) {
+      segs.push({ k, u, r, len: Math.min(S[k].len - u, end - r), mid: u <= S[k].len / 2 && u + Math.min(S[k].len - u, end - r) >= S[k].len / 2 }); // goal at the side's middle
+      r += S[k].len - u;
+    }
+    break;
+  }
+  let seg = 0, pos = 0;
   return p.stations.map(st => {
     if (st.kind === 'goal') {
-      const gs = (side === 0 ? [1, 3] : side <= 2 ? [3] : []).find(k => G.goals[k]); // next free goal end
-      if (gs == null) return { fits: false };
-      side = gs + 1; pos = 0;
-      const frame = G.goals[gs];
-      return { fits: true, goal: true, side: gs, frame, entry: null, exit: toWorld(frame, st.action.u, st.action.v) };
+      const j = segs.findIndex((g, j) => j > seg && g.mid && G.goals[g.k]); // next free goal end
+      if (j < 0) return { fits: false };
+      seg = j + 1; pos = 0;
+      const frame = G.goals[segs[j].k];
+      return { fits: true, goal: true, side: segs[j].k, frame, entry: null, exit: toWorld(frame, st.action.u, st.action.v) };
     }
     if (st.pin) {
       const frame = st.pin, entry = { x: frame.x, y: frame.y }, exit = toWorld(frame, span(st), 0);
       // a pinned station still marks a place on the lane: the next station continues after it
-      const s = Math.max(project(entry, G).s, project(exit, G).s);
-      const cur = side >= 4 ? G.lap : S.slice(0, side).reduce((a, x) => a + x.len, 0) + pos;
-      if (s > cur + 1e-9) {
-        let k = 0, u = s;
-        while (k < 3 && u > S[k].len + 1e-9) { u -= S[k].len; k++; }
-        side = k; pos = u;
-      }
+      const r = Math.max(rel(project(entry, G).s), rel(project(exit, G).s));
+      const cur = seg < segs.length ? segs[seg].r + pos : Infinity;
+      if (r > cur + 1e-9 && r < end) { seg = segs.findLastIndex(g => g.r <= r + 1e-9); pos = r - segs[seg].r; }
       return { fits: true, pinned: true, frame, entry, exit };
     }
     let start = pos + GAP;
     const len = span(st);
-    const room = k => S[k].len - (k === 3 ? GAP : 0); // keep the gap before the finish free
-    while (side < 4 && start + len > room(side) + 1e-9) { side++; start = GAP; } // ponytail: no bending, jump to next side
-    if (side >= 4) return { fits: false };
-    const frame = { ...toWorld(S[side], start, 0), rot: S[side].rot };
+    while (seg < segs.length && start + len > segs[seg].len + 1e-9) { seg++; start = GAP; } // ponytail: no bending, jump to next side
+    if (seg >= segs.length) return { fits: false };
+    const g = segs[seg], frame = { ...toWorld(S[g.k], g.u + start, 0), rot: S[g.k].rot };
     pos = start + len;
-    return { fits: true, side, frame, entry: { x: frame.x, y: frame.y }, exit: toWorld(frame, len, 0) };
+    return { fits: true, side: g.k, frame, entry: { x: frame.x, y: frame.y }, exit: toWorld(frame, len, 0) };
   });
 }
 
 export const startPoint = hall => ({ x: INSET + START_LEN / 2, y: INSET });
-export const startExit = p => ({ x: p.start.x + START_LEN / 2, y: p.start.y });
-export const finishPoint = p => ({ x: p.start.x - START_LEN / 2, y: p.start.y });
+// The start box points along the lane side it sits on: start exit ahead, finish behind it.
+export const startFrame = p => { const G = geom(hallOf(p)); return { ...p.start, rot: G.sides[project(p.start, G).k].rot }; };
+export const startExit = p => toWorld(startFrame(p), START_LEN / 2, 0);
+export const finishPoint = p => toWorld(startFrame(p), -START_LEN / 2, 0);
 
 // Nearest lane point and its distance along the lane.
 export function project(pt, G = geom()) {
   let best = null, off = 0;
-  for (const S of G.sides) {
+  for (const [k, S] of G.sides.entries()) {
     const u = clamp(toLocal(S, pt.x, pt.y).u, 0, S.len), w = toWorld(S, u, 0);
     const d = Math.hypot(w.x - pt.x, w.y - pt.y);
-    if (!best || d < best.d - 1e-9) best = { d, s: off + u, pt: w };
+    if (!best || d < best.d - 1e-9) best = { d, s: off + u, pt: w, k };
     off += S.len;
   }
   return best;
@@ -212,7 +221,7 @@ const toRel = (q, a, b) => {
 function runLine(a, b, via, G, to) {
   if (via) return { type: 'line', to, pts: [a, ...via.map(v => fromRel(v, a, b)), b] };
   const direct = { type: 'line', to, pts: [a, b] };
-  if (project(a, G).d > 0.5 || project(b, G).d > 0.5) return direct;
+  if (to !== -1 && (project(a, G).d > 0.5 || project(b, G).d > 0.5)) return direct;
   const lane = laneRoute(a, b, G), ll = polyLen(lane), dl = Math.hypot(b.x - a.x, b.y - a.y);
   // the run to the finish always follows the lane: with few or no stations it is a full lap
   return to !== -1 && ll > 3 * dl && ll - dl > 20 ? direct : { type: 'line', to, pts: lane };
