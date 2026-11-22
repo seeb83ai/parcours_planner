@@ -8,7 +8,11 @@ The interface is in German and English.
 
 - **Step-by-step building:** pick a station from the catalog. It goes on a lane 2.5 m inside the walls, after the selected station.
 - **Goal stations:** at most one in front of each goal. They have a throw spot and a run path that you can bend.
-- **Catalog with 51 stations:** dribbling, ball feeling, passing, throwing, defence and movement. The stations follow common F-Jugend exercises, for example from the BWHV/HVW Kinderhandball catalog.
+- **Catalog with 52 stations:** dribbling, ball feeling, passing, throwing, defence and movement. The stations follow common F-Jugend exercises, for example from the BWHV/HVW Kinderhandball catalog.
+- **Filter:** narrow the catalog with a dropdown:
+  - by ball: with ball, without ball
+  - by activity: dribbling, passing, throwing, ball feeling, defence, jumping, crawling and rolling, goal stations
+  - by equipment: cones, hoops, bench, mat, box, helper needed, little equipment
 - **Places (Plätze):** more places repeat a station's set-up side by side or one after another. The equipment list counts every place.
 - **Length:** drag the bar at the start or end of a selected station, or use the slider. Rows of cones, hoops, hurdles, mats or cone gates keep at least their spacing: an item is added as soon as it fits and removed when it no longer does.
 - **Free editing:** drag stations, equipment and number badges. Rotate with Ctrl+drag or the ↻ handle, or by 90° with the R key. Delete with Del. You can also add extra equipment.
@@ -99,6 +103,7 @@ Other fields:
 | `spots` | `'across'` (default): extra places go side by side. `'along'`: extra places go one after another. |
 | `spotStep` | Distance between places side by side, in metres (default 2) |
 | `flow: true` | Children follow each other without waiting, so the app shows no queue warning |
+| `TAGS` | List at the end of `stations.js`. Add the station there if it belongs to `springen`, `kriechen` or another filter that the app cannot derive from the skill or the equipment. |
 
 Write the texts as `{ de, en }`.
 

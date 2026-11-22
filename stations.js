@@ -251,8 +251,53 @@ export const CATALOG = [
     items: [{ type: 'kastendeckel', u: 7, v: 0 }, { type: 'mat', u: 5.4, v: 0 }, { type: 'ballbox', u: 11, v: 3.5 }],
     name: T('Sprungwurf über den Kastendeckel', 'Jump shot over the box top'),
     task: T('Ball nehmen, anlaufen, vor dem Kastendeckel einbeinig abspringen, im Sprung werfen und auf der Matte landen.', 'Take a ball, run up, take off on one leg before the box top, throw in the air and land on the mat.') },
+  { ref: 'doppelpass-tor', kind: 'goal', skill: 'throwing', capacity: 1,
+    action: { u: 7.5, v: 0 }, target: { u: 0, v: 0 }, targetKind: 'throw', approach: { u: 12, v: 2.5 }, // run past the marker
+    items: [{ type: 'disc', u: 10.5, v: 2.5 }, { type: 'helper', u: 10, v: -3.2 }],
+    arrows: [{ kind: 'pass', from: { u: 10.4, v: 2.1 }, to: { u: 10, v: -2.7 } },
+             { kind: 'pass', from: { u: 9.6, v: -2.9 }, to: { u: 7.9, v: -0.4 } }],
+    name: T('Torwurf mit Doppelpass zum Helfer', 'Shot after a one-two with the helper'),
+    task: T('Bis zum Teller prellen, zum Helfer passen, weiterlaufen, den Rückpass fangen und aufs Tor werfen.',
+            'Dribble to the marker, pass to the helper, keep running, catch the return pass and shoot at the goal.') },
   { ref: 'torstation', kind: 'goal', skill: 'other', capacity: 1,
     action: { u: 7, v: 0 }, target: null, items: [],
     name: T('Freie Torstation', 'Free goal station'),
     task: T('Aufgabe vor dem Tor hier beschreiben.', 'Describe the task in front of the goal here.') },
+];
+
+// Extra tags for the catalog filter where skill and material are not enough.
+const TAGS = {
+  springen: ['huerdenlauf', 'reifenbahn', 'huepfkaestchen', 'kasten-sprung', 'baenke-springen', 'bank-hopser', 'kaenguru',
+    'sprungwurf', 'sprungwurf-kastendeckel', 'tarzan'],
+  kriechen: ['bank-kriechen', 'kriechtunnel', 'purzelbaum', 'baumstammrolle', 'weichboden-berg', 'bank-ziehen', 'baerengang', 'krebsgang'],
+  prellen: ['eins-gegen-eins', 'zielwurf', 'doppelpass-tor'],
+  werfen: ['schnur-werfen', 'hochwerfen-fangen'],
+  passen: ['doppelpass-tor'],
+  ball: ['krebsgang'],
+};
+for (const [tag, refs] of Object.entries(TAGS)) for (const r of refs) (CATALOG.find(c => c.ref === r).tags ??= []).push(tag);
+
+// Catalog filter (dropdown). Works on catalog entries and on saved own stations.
+const tag = (e, t) => (e.tags || []).includes(t);
+const has = (e, ...types) => e.items.some(it => types.includes(it.type));
+const withBall = e => tag(e, 'ball') || (e.skill !== 'movement');
+export const FILTERS = [
+  { id: 'all', f: () => true },
+  { group: 'ball', id: 'ball', f: withBall },
+  { group: 'ball', id: 'noball', f: e => !withBall(e) },
+  { group: 'activity', id: 'prellen', f: e => e.skill === 'dribbling' || tag(e, 'prellen') },
+  { group: 'activity', id: 'passen', f: e => e.skill === 'passing' || tag(e, 'passen') },
+  { group: 'activity', id: 'werfen', f: e => e.skill === 'throwing' || tag(e, 'werfen') },
+  { group: 'activity', id: 'ballgefuehl', f: e => e.skill === 'ballFeeling' },
+  { group: 'activity', id: 'abwehr', f: e => e.skill === 'defence' },
+  { group: 'activity', id: 'springen', f: e => tag(e, 'springen') },
+  { group: 'activity', id: 'kriechen', f: e => tag(e, 'kriechen') },
+  { group: 'activity', id: 'tor', f: e => e.kind === 'goal' },
+  { group: 'material', id: 'huetchen', f: e => has(e, 'cone') },
+  { group: 'material', id: 'reifen', f: e => has(e, 'hoop') },
+  { group: 'material', id: 'bank', f: e => has(e, 'bench') },
+  { group: 'material', id: 'matte', f: e => has(e, 'mat', 'weichboden') },
+  { group: 'material', id: 'kasten', f: e => has(e, 'kasten', 'kastendeckel') },
+  { group: 'material', id: 'helfer', f: e => has(e, 'helper') },
+  { group: 'material', id: 'wenig', f: e => e.items.every(it => ['cone', 'hoop', 'disc'].includes(it.type)) },
 ];

@@ -201,9 +201,8 @@ export function newStation(entry, lang) {
   const st = structuredClone(entry);
   Object.assign(st, { name: tx(entry.name), task: tx(entry.task), badge: null });
   st.arrows ??= [];
-  delete st.skill;
   if (st.kind === 'lane') st.pin = null;
-  else Object.assign(st, { approach: null, exitCtrl: null });
+  else Object.assign(st, { approach: entry.approach ?? null, exitCtrl: null });
   return st;
 }
 

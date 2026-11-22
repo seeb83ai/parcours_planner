@@ -1,5 +1,5 @@
 import { t, setLang, getLang } from './i18n.js';
-import { CATALOG } from './stations.js';
+import { CATALOG, FILTERS } from './stations.js';
 import { PRESETS, buildPreset } from './presets.js';
 import * as M from './model.js';
 import { courtInner, pageSVG, esc, badgePos, stationBox, itemPlace } from './court.js';
@@ -50,6 +50,10 @@ function renderAll() {
   $('group').value = P.group;
   $('children').value = P.children;
   $('interval').value = P.interval;
+  const fv = $('filter').value || 'all', groups = [...new Set(FILTERS.map(x => x.group).filter(Boolean))];
+  $('filter').innerHTML = `<option value="all">${esc(t('filter.all'))}</option>` + groups.map(g => `<optgroup label="${esc(t('filter.g.' + g))}">`
+    + FILTERS.filter(x => x.group === g).map(x => `<option value="${x.id}">${esc(t('filter.' + x.id))}</option>`).join('') + '</optgroup>').join('');
+  $('filter').value = fv;
   $('tpl').innerHTML = `<option value="">${esc(t('tb.template'))}</option>`
     + PRESETS.map(d => `<option value="${d.id}">${esc(d.title[getLang()] ?? d.title.de)}</option>`).join('');
   renderCatalog();
@@ -89,11 +93,11 @@ function renderSelbar() {
 }
 
 function renderCatalog() {
-  const q = $('filter').value.trim().toLowerCase(), lang = getLang();
+  const lang = getLang(), flt = FILTERS.find(x => x.id === $('filter').value) || FILTERS[0];
   const name = e => (typeof e.name === 'string' ? e.name : e.name[lang] ?? e.name.de);
   const row = (e, attr, del = '') => `<div class="cat-item"><button class="add" ${attr}>${esc(name(e))}</button>`
     + `<span class="meta">${e.kind === 'lane' ? `${e.length} m` : ''}</span>${del}</div>`;
-  const match = e => !q || name(e).toLowerCase().includes(q);
+  const match = e => flt.f(e);
   let h = '';
   const mine = custom.map((e, k) => [e, k]).filter(([e]) => match(e));
   if (mine.length) h += `<div class="cat-group">${esc(t('side.custom'))}</div>`
@@ -325,7 +329,7 @@ $('catalog').addEventListener('click', e => {
     renderCatalog();
   }
 });
-$('filter').addEventListener('input', renderCatalog);
+$('filter').addEventListener('change', renderCatalog);
 $('palette').innerHTML = Object.keys(M.ITEM_TYPES).map(k => `<button data-type="${k}" data-i18n="item.${k}"></button>`).join('');
 $('palette').addEventListener('click', e => { const b = e.target.closest('button'); if (b) addItem(b.dataset.type); });
 $('selbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) selAction(b.dataset.sact); });

@@ -1,6 +1,6 @@
 // Layout logic checks. Run: `node test.js`, or open test.html in the browser.
 import * as M from './model.js';
-import { CATALOG } from './stations.js';
+import { CATALOG, FILTERS } from './stations.js';
 import { PRESETS, buildPreset } from './presets.js';
 
 const results = [];
@@ -111,6 +111,11 @@ for (const def of PRESETS) for (const lang of ['de', 'en']) {
   const bad = pp.stations.filter((s, i) => !ll[i].fits).map(s => s.name);
   check(`preset ${def.id} (${lang}) fits: ${bad.join(', ') || 'all'}`, !bad.length && !(() => { try { M.validate(pp); } catch { return true; } })());
 }
+
+// catalog filter: every option finds stations, "mit Ball" and "ohne Ball" split the catalog
+for (const x of FILTERS) check(`filter ${x.id} finds stations`, CATALOG.some(x.f));
+const fb = id => CATALOG.filter(FILTERS.find(x => x.id === id).f).length;
+check('with + without ball = all', fb('ball') + fb('noball') === CATALOG.length && fb('noball') > 0);
 
 // validation at the import boundary
 const bad = x => { try { M.validate(x); return false; } catch { return true; } };
