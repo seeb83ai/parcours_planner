@@ -70,6 +70,7 @@ The interface and the station catalog are in German and English. When you switch
   | Athletik-Zirkel, Sprungkraft & Schnelligkeit (both station circuits), Handball-Parcours C–A | C to A |
 
   A template sets its own start interval and format where it needs them (for example 8 s for the older groups, or the station circuit for athletics).
+- **Empty station:** "+ Leere Station" at the top of the catalog inserts a station without equipment. Equipment from "Material hinzufügen" then goes onto it in a row along the run. Write the task and drag the items where you want them.
 - **Your own stations:** save a changed station as your own (☆). Export your stations as a file and import them in another browser to share them with other coaches.
 
 ## Use it

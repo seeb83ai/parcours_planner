@@ -1,6 +1,6 @@
 // Layout logic checks. Run: `node test.js`, or open test.html in the browser.
 import * as M from './model.js';
-import { CATALOG, FILTERS, forAge } from './stations.js';
+import { CATALOG, FILTERS, forAge, BLANK } from './stations.js';
 import { PRESETS, buildPreset } from './presets.js';
 import { caption } from './court.js';
 
@@ -19,6 +19,8 @@ const near = (a, b) => Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6;
   const e0 = CATALOG.find(c => c.ref === p.stations[0].ref), e2 = CATALOG.find(c => c.ref === p.stations[2].ref);
   check('language switch translates unchanged station texts, keeps own ones', p.stations[0].name === e0.name.en && p.stations[0].task === e0.task.en
     && p.stations[1].name === 'Mein Name' && p.stations[2].task === (e2.hard?.en ?? e2.task.en) && (!p.stations[2].variants || p.stations[2].variants.normal === e2.task.en)); }
+{ const e = { ...M.emptyParcours(), stations: [M.newStation(BLANK, 'en')] }, l = M.layout(e);
+  check('empty station: no equipment, fits on the lane, English name', l[0].fits && !e.stations[0].items.length && e.stations[0].name === 'Custom station' && !M.material(e).length); }
 check('badge caption wraps at spaces, two lines at most', JSON.stringify(caption('Sprungwurf über die Bank')) === '["Sprungwurf über","die Bank"]'
   && JSON.stringify(caption('Luftballon hochhalten und fangen')) === '["Luftballon","hochhalten und…"]' && caption('Wackelberg').length === 1);
 

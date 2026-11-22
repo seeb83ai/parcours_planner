@@ -12,6 +12,10 @@ import { AGES } from './model.js';
 
 const T = (de, en) => ({ de, en });
 
+// Empty station: the coach adds equipment from the palette and writes the task (not part of the catalog list).
+export const BLANK = { ref: 'leer', kind: 'lane', skill: 'other', capacity: 1, path: 'straight', length: 6, minLength: 2, maxLength: 14, items: [],
+  name: T('Eigene Station', 'Custom station'), task: T('', '') };
+
 export const CATALOG = [
   // --- Prellen / dribbling
   { ref: 'slalom-prellen', kind: 'lane', skill: 'dribbling', capacity: 1, flow: true, spotStep: 2.2, path: 'slalom',

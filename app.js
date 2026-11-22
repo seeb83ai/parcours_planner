@@ -1,5 +1,6 @@
 import { t, setLang, getLang } from './i18n.js';
-import { CATALOG, FILTERS, forAge } from './stations.js';
+import { CATALOG, FILTERS, forAge, BLANK } from './stations.js';
+const TEXTS = [...CATALOG, BLANK]; // stations whose texts follow the language
 import { PRESETS, buildPreset } from './presets.js';
 import * as M from './model.js';
 import { courtInner, pageSVG, esc, stationBox, itemPlace, viewBox } from './court.js';
@@ -186,7 +187,7 @@ function renderStations() {
 <span class="badge" draggable="true" title="${esc(t('st.drag'))}">${i + 1}</span>
 <div><div class="st-head"><input data-f="name" value="${esc(st.name)}" aria-label="Name">${flags}
 ${ib('up', 'st.up', '↑')}${ib('down', 'st.down', '↓')}${ib('dup', 'st.dup', '⧉')}${ib('custom', 'st.saveCustom', '☆')}${ib('del', 'st.delete', '✕')}</div>
-<div class="task-row"><textarea data-f="task" rows="2" aria-label="Aufgabe">${esc(st.task)}</textarea>${levels}</div>
+<div class="task-row"><textarea data-f="task" rows="2" aria-label="Aufgabe" placeholder="${esc(t('st.taskPh'))}">${esc(st.task)}</textarea>${levels}</div>
 <div class="st-meta">${len}<label>${esc(t('st.capacity'))} <input type="number" data-f="capacity" min="1" max="6" value="${st.capacity}"></label>${secs}</div></div></li>`;
   }).join('');
 }
@@ -206,7 +207,9 @@ function addItem(type) {
   change(() => {
     const st = P.stations[sel.st], hall = M.hallOf(P);
     if (st) {
-      const it = st.kind === 'lane' ? { type, u: st.length / 2, v: 1.5 } : { type, u: st.action.u - 1.5, v: st.action.v + 1.5 };
+      // empty station: items in a row along the run, 1.5 m apart; others: beside the run, in the middle
+      const n = st.items.length, it = st.kind === 'goal' ? { type, u: st.action.u - 1.5, v: st.action.v + 1.5 }
+        : st.ref === BLANK.ref ? { type, u: (0.5 + 1.5 * n) % st.length, v: 0 } : { type, u: st.length / 2, v: 1.5 };
       st.items.push(it);
       sel.item = st.items.length - 1;
     } else {
@@ -294,7 +297,7 @@ function setLevel(i, level) {
 
 function replace(next) {
   if (P.stations.length && !confirm(t('confirm.replace'))) return false;
-  change(() => { P = M.translate(next, CATALOG, getLang()); sel = {}; });
+  change(() => { P = M.translate(next, TEXTS, getLang()); sel = {}; });
   return true;
 }
 
@@ -466,6 +469,7 @@ $('catalog').addEventListener('click', e => {
 });
 $('filter').addEventListener('change', renderCatalog);
 $('palette').innerHTML = Object.keys(M.ITEM_TYPES).map(k => `<button data-type="${k}" data-i18n="item.${k}"></button>`).join('');
+$('btn-blank').addEventListener('click', () => addStation(BLANK));
 $('palette').addEventListener('click', e => { const b = e.target.closest('button'); if (b) addItem(b.dataset.type); });
 $('selbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) selAction(b.dataset.sact); });
 $('selbar').addEventListener('focusin', e => { if (e.target.dataset.size) begin(); });
@@ -614,7 +618,7 @@ $('btn-redo').addEventListener('click', () => restore(redo, undo));
 $('lang').addEventListener('change', e => {
   const old = getLang(), lang = e.target.value, tpl = PRESETS.find(d => d.title[old] === P.title);
   setLang(lang);
-  M.translate(P, CATALOG, lang); // unchanged catalog texts follow the language, own texts stay
+  M.translate(P, TEXTS, lang); // unchanged catalog texts follow the language, own texts stay
   if (tpl) P.title = tpl.title[lang] ?? P.title;
   renderAll();
 });
@@ -633,7 +637,7 @@ async function openShared() {
   try {
     const shared = await M.decodeShare(location.hash.slice(3));
     begin(); // the previous draft stays reachable with undo
-    P = M.translate(shared, CATALOG, getLang()); // a German link opens in English for an English user
+    P = M.translate(shared, TEXTS, getLang()); // a German link opens in English for an English user
     commit();
     sel = {};
     renderAll();
