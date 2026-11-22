@@ -13,6 +13,12 @@ const near = (a, b) => Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6;
   check('empty parcours: run from start to finish goes around the lane', c.length === 1 && c[0].pts.length >= 5); }
 { const e = { ...M.emptyParcours(), start: { x: 20, y: M.INSET }, stations: [st('kaenguru'), st('zielwurf'), st('kaenguru')] }, l = M.layout(e);
   check('moved start: stations follow it clockwise', l[0].side === 0 && l[0].frame.x > 22 - 1e-6 && l[1].goal && l[1].side === 1 && l[2].side === 2); }
+{ const p = buildPreset(PRESETS.find(d => d.id === 'ball'), 'de');
+  p.stations[1].name = 'Mein Name'; p.stations[2].level = 'hard'; p.stations[2].task = p.stations[2].variants?.hard ?? p.stations[2].task;
+  M.translate(p, CATALOG, 'en');
+  const e0 = CATALOG.find(c => c.ref === p.stations[0].ref), e2 = CATALOG.find(c => c.ref === p.stations[2].ref);
+  check('language switch translates unchanged station texts, keeps own ones', p.stations[0].name === e0.name.en && p.stations[0].task === e0.task.en
+    && p.stations[1].name === 'Mein Name' && p.stations[2].task === (e2.hard?.en ?? e2.task.en) && (!p.stations[2].variants || p.stations[2].variants.normal === e2.task.en)); }
 check('badge caption wraps at spaces, two lines at most', JSON.stringify(caption('Sprungwurf über die Bank')) === '["Sprungwurf über","die Bank"]'
   && JSON.stringify(caption('Luftballon hochhalten und fangen')) === '["Luftballon","hochhalten und…"]' && caption('Wackelberg').length === 1);
 

@@ -2,7 +2,7 @@
 
 A web app for handball coaches to plan a gym parcours (obstacle course) or a station circuit for youth teams, from the Super-Minis (age 3–5) to the A-Jugend (under 19). It was made first for the F-Jugend (under 9). You build the parcours step by step: each station is placed clockwise around the hall. You can then print it on A4 or share it as an image.
 
-The interface is in German and English.
+The interface and the station catalog are in German and English. When you switch the language, the stations on the court switch too; only texts you changed yourself stay as they are. Shared links and imported files open in your language.
 
 **Online:** https://seeb83ai.github.io/parcours_planner/
 

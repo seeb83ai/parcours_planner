@@ -402,6 +402,23 @@ export const stationMaterial = st => material({ free: [], stations: [st] });
 export const shortages = (p, inv = {}) =>
   material(p).filter(m => Number.isFinite(inv[m.type]) && m.n > inv[m.type]).map(m => ({ ...m, have: inv[m.type] }));
 
+// Switch the texts of catalog stations to `lang`. Only texts the coach did not change (equal to the
+// catalog text in some language) are replaced; own texts stay as they are.
+export function translate(p, catalog, lang) {
+  for (const st of p.stations) {
+    const e = catalog.find(c => c.ref === st.ref);
+    if (!e) continue;
+    const swap = (v, ...keys) => {
+      for (const k of keys) for (const l in e[k] ?? {}) if (e[k][l] === v) return e[k][lang] ?? v;
+      return v;
+    };
+    st.name = swap(st.name, 'name');
+    st.task = swap(st.task, 'task', 'easy', 'hard');
+    if (st.variants) for (const [lv, k] of [['easy', 'easy'], ['normal', 'task'], ['hard', 'hard']]) st.variants[lv] = swap(st.variants[lv], k);
+  }
+  return p;
+}
+
 // Copy a catalog entry into a parcours station; texts become plain strings in `lang`.
 export function newStation(entry, lang) {
   const tx = v => (typeof v === 'string' ? v : v?.[lang] ?? v?.de ?? '');

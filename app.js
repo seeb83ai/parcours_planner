@@ -294,7 +294,7 @@ function setLevel(i, level) {
 
 function replace(next) {
   if (P.stations.length && !confirm(t('confirm.replace'))) return false;
-  change(() => { P = next; sel = {}; });
+  change(() => { P = M.translate(next, CATALOG, getLang()); sel = {}; });
   return true;
 }
 
@@ -611,7 +611,13 @@ $('btn-print').addEventListener('click', () => { renderPrint(); window.print(); 
 window.addEventListener('beforeprint', renderPrint);
 $('btn-undo').addEventListener('click', () => restore(undo, redo));
 $('btn-redo').addEventListener('click', () => restore(redo, undo));
-$('lang').addEventListener('change', e => { setLang(e.target.value); renderAll(); });
+$('lang').addEventListener('change', e => {
+  const old = getLang(), lang = e.target.value, tpl = PRESETS.find(d => d.title[old] === P.title);
+  setLang(lang);
+  M.translate(P, CATALOG, lang); // unchanged catalog texts follow the language, own texts stay
+  if (tpl) P.title = tpl.title[lang] ?? P.title;
+  renderAll();
+});
 $('btn-help').addEventListener('click', () => $('help').showModal());
 
 // share link: the whole parcours in the URL
@@ -627,7 +633,7 @@ async function openShared() {
   try {
     const shared = await M.decodeShare(location.hash.slice(3));
     begin(); // the previous draft stays reachable with undo
-    P = shared;
+    P = M.translate(shared, CATALOG, getLang()); // a German link opens in English for an English user
     commit();
     sel = {};
     renderAll();
