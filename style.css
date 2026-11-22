@@ -1,3 +1,4 @@
+[hidden] { display: none !important; } /* author display rules (e.g. .side label) must not override the hidden attribute */
 :root {
   --bg: #f5f5f2; --card: #fff; --ink: #111827; --muted: #6b7280; --line: #e5e7eb;
   --accent: #0f766e; --accent-soft: #d5ebe4; --warn: #c2410c; --warn-soft: #fff1e8;
