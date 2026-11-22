@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "title": "Parkour in der Turnhalle",
+  "language": "de",
+  "court": { "length": 40, "width": 20, "unit": "m", "wallsAtLines": true },
+  "group": { "name": "F-Jugend", "children": 23 },
+  "startIntervalSeconds": 5,
+  "start": { "x": 3.25, "y": 17.5, "w": 4.5, "h": 1.2, "label": "Start / Ziel" },
+  "extraItems": [],
+  "stations": [
+    {
+      "number": 1,
+      "name": "Slalom vorwärts",
+      "task": "Im Sprint um die Hütchen laufen.",
+      "skills": ["speed"],
+      "capacity": 1,
+      "label": { "x": 11, "y": 15.64 },
+      "items": [
+        { "type": "cone", "x": 7, "y": 17.5 },
+        { "type": "cone", "x": 9, "y": 17.5 },
+        { "type": "cone", "x": 11, "y": 17.5 },
+        { "type": "cone", "x": 13, "y": 17.5 },
+        { "type": "cone", "x": 15, "y": 17.5 }
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Balancieren",
+      "task": "Über die Bank gehen. Schwerer: rückwärts oder mit Ball.",
+      "skills": ["balance"],
+      "capacity": 1,
+      "label": { "x": 20, "y": 15.64 },
+      "items": [
+        { "type": "bench", "x": 20, "y": 17.5, "rotation": 0 }
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Auf Bank ziehen",
+      "task": "In Bauchlage auf die Bank legen. Mit den Armen nach vorn ziehen.",
+      "skills": ["strength"],
+      "capacity": 1,
+      "label": { "x": 27, "y": 15.64 },
+      "items": [
+        { "type": "bench", "x": 27, "y": 17.5, "rotation": 0 }
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Sprungwurf",
+      "task": "Ball nehmen, 3 Schritte, Absprung an der 6-m-Linie, Wurf aufs Tor, Landung auf dem Weichboden.",
+      "skills": ["throwing", "jumping"],
+      "capacity": 1,
+      "label": { "x": 35.3, "y": 13.14 },
+      "items": [
+        { "type": "weichboden", "x": 35.3, "y": 10, "w": 2, "h": 3 },
+        { "type": "ballbox", "x": 29.6, "y": 12.5, "w": 2, "h": 1, "label": "Bälle", "count": 10 }
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Bänke überspringen",
+      "task": "Mit beiden Beinen über jede Bank springen.",
+      "skills": ["jumping"],
+      "capacity": 2,
+      "label": { "x": 27.75, "y": 6.24 },
+      "items": [
+        { "type": "bench", "x": 29, "y": 3, "rotation": 90 },
+        { "type": "bench", "x": 26.5, "y": 3, "rotation": 90 }
+      ],
+      "variants": ["Mit einer 6. Bank: dritte Bank bei x = 24 dazu."]
+    },
+    {
+      "number": 6,
+      "name": "Unter Bank kriechen",
+      "task": "Unter der Bank durchkriechen. Die Bank liegt auf 2 Kastendeckeln.",
+      "skills": ["crawling"],
+      "capacity": 1,
+      "label": { "x": 19, "y": 6.24 },
+      "items": [
+        { "type": "kastendeckel", "x": 20, "y": 1.4 },
+        { "type": "kastendeckel", "x": 20, "y": 4.6 },
+        { "type": "bench", "x": 20, "y": 3, "rotation": 90, "raised": true }
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Purzelbaum",
+      "task": "Auf jeder Matte eine Rolle vorwärts.",
+      "skills": ["rolling"],
+      "capacity": 3,
+      "label": { "x": 10.95, "y": 4.84 },
+      "items": [
+        { "type": "mat", "x": 14, "y": 3, "w": 2, "h": 1 },
+        { "type": "mat", "x": 11.5, "y": 3, "w": 2, "h": 1 },
+        { "type": "mat", "x": 9, "y": 3, "w": 2, "h": 1 }
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Seitwärts",
+      "task": "Im Seitgalopp an den Hütchen vorbei. Blick nach vorn.",
+      "skills": ["speed", "sideways"],
+      "capacity": 2,
+      "label": { "x": 7.5, "y": 7 },
+      "items": [
+        { "type": "cone", "x": 4, "y": 5 },
+        { "type": "cone", "x": 4, "y": 7 },
+        { "type": "cone", "x": 4, "y": 9 }
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Rückwärts",
+      "task": "Rückwärts zum Ziel laufen. Über die Schulter schauen.",
+      "skills": ["speed", "backwards"],
+      "capacity": 2,
+      "label": { "x": 7.5, "y": 13.25 },
+      "items": [
+        { "type": "cone", "x": 3.2, "y": 11 },
+        { "type": "cone", "x": 4.8, "y": 11 },
+        { "type": "cone", "x": 3.2, "y": 15.5 },
+        { "type": "cone", "x": 4.8, "y": 15.5 }
+      ]
+    }
+  ],
+  "path": [
+    { "kind": "slalom", "points": [[5.5, 17.5], [16, 17.5]], "amplitude": 0.7, "head": false },
+    { "kind": "run", "points": [[16, 17.5], [18, 17.5]] },
+    { "kind": "run", "points": [[22, 17.5], [25, 17.5]] },
+    { "kind": "run", "points": [[29, 17.5], [31, 17.5], [31, 10], [34.3, 10]] },
+    { "kind": "run", "points": [[35.3, 8.5], [35.3, 3], [29.3, 3]] },
+    { "kind": "run", "points": [[26.2, 3], [20.5, 3]] },
+    { "kind": "run", "points": [[19.5, 3], [15, 3]] },
+    { "kind": "run", "points": [[8, 3], [4, 3], [4, 4.7]] },
+    { "kind": "run", "points": [[4, 5.3], [4, 10.7]] },
+    { "kind": "run", "points": [[4, 11.3], [4, 16.9]] }
+  ],
+  "notes": [
+    { "legend": true, "text": "6. Bank: zu Station 5 dazu." },
+    { "legend": true, "text": "Ein Helfer bringt die Bälle zurück." }
+  ]
+}

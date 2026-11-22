@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcours-Planer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<header class="bar">
+  <h1 data-i18n="app.title">Parcours-Planer</h1>
+  <input id="title" class="title-input" data-i18n-ph="untitled" aria-label="Titel">
+  <nav class="tools">
+    <button id="btn-new" data-i18n="tb.new"></button>
+    <select id="tpl" aria-label="Vorlage">
+      <option value="" data-i18n="tb.template"></option>
+      <option value="parcours1" data-i18n="tpl.parcours1"></option>
+      <option value="parcours2" data-i18n="tpl.parcours2"></option>
+    </select>
+    <label class="btn"><span data-i18n="tb.import"></span><input id="file" type="file" accept=".json,application/json" hidden></label>
+    <button id="btn-export" data-i18n="tb.export"></button>
+    <button id="btn-png" data-i18n="tb.png"></button>
+    <button id="btn-print" data-i18n="tb.print"></button>
+    <button id="btn-undo" data-i18n-title="tb.undo">↶</button>
+    <button id="btn-redo" data-i18n-title="tb.redo">↷</button>
+    <select id="lang" aria-label="Sprache / Language"><option value="de">DE</option><option value="en">EN</option></select>
+  </nav>
+</header>
+
+<main class="layout">
+  <aside class="side">
+    <section class="card">
+      <h2 data-i18n="side.catalog"></h2>
+      <input id="filter" type="search" data-i18n-ph="side.filter">
+      <div id="catalog"></div>
+    </section>
+    <section class="card">
+      <h2 data-i18n="side.palette"></h2>
+      <div id="palette" class="palette"></div>
+      <p id="palette-hint" class="muted"></p>
+    </section>
+    <section class="card">
+      <h2 data-i18n="side.settings"></h2>
+      <label><span data-i18n="f.group"></span><input id="group"></label>
+      <label><span data-i18n="f.children"></span><input id="children" type="number" min="1" max="60"></label>
+      <label><span data-i18n="f.interval"></span><input id="interval" type="number" min="1" max="60"></label>
+    </section>
+    <section class="card">
+      <h2 data-i18n="side.hints"></h2>
+      <ul id="hints" class="hints"></ul>
+      <h2 data-i18n="side.material"></h2>
+      <ul id="material" class="material"></ul>
+    </section>
+  </aside>
+
+  <div class="center">
+    <div class="card court-card">
+      <svg id="court" viewBox="-1.6 -1 43.2 22" role="img" aria-label="Spielfeld" font-family="Inter, system-ui, sans-serif"></svg>
+      <div id="selbar" class="selbar"></div>
+    </div>
+    <section class="card">
+      <h2 data-i18n="st.heading"></h2>
+      <ol id="stations" class="stations"></ol>
+    </section>
+  </div>
+</main>
+
+<div id="print-area"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

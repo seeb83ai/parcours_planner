@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 2,
+  "title": "Ball-Parcours F-Jugend",
+  "group": "F-Jugend",
+  "children": 22,
+  "interval": 5,
+  "start": {
+    "x": 4.5,
+    "y": 2.5
+  },
+  "free": [
+    {
+      "type": "ballbox",
+      "x": 4.5,
+      "y": 4,
+      "rot": 0
+    }
+  ],
+  "stations": [
+    {
+      "ref": "slalom-prellen",
+      "kind": "lane",
+      "capacity": 1,
+      "flow": true,
+      "spotStep": 2.2,
+      "path": "slalom",
+      "length": 14,
+      "minLength": 6,
+      "maxLength": 14,
+      "items": [
+        {
+          "type": "cone",
+          "f": 0,
+          "v": 0
+        },
+        {
+          "type": "cone",
+          "f": 0.25,
+          "v": 0
+        },
+        {
+          "type": "cone",
+          "f": 0.5,
+          "v": 0
+        },
+        {
+          "type": "cone",
+          "f": 0.75,
+          "v": 0
+        },
+        {
+          "type": "cone",
+          "f": 1,
+          "v": 0
+        }
+      ],
+      "name": "Slalom prellen",
+      "task": "Prellend um die Hütchen laufen. Schwerer: mit der schwachen Hand.",
+      "badge": null,
+      "arrows": [],
+      "pin": null
+    },
+    {
+      "ref": "reifen-prellen",
+      "kind": "lane",
+      "capacity": 1,
+      "flow": true,
+      "path": "straight",
+      "length": 10,
+      "minLength": 5,
+      "maxLength": 10,
+      "items": [
+        {
+          "type": "hoop",
+          "f": 0,
+          "v": -0.4
+        },
+        {
+          "type": "hoop",
+          "f": 0.25,
+          "v": 0.4
+        },
+        {
+          "type": "hoop",
+          "f": 0.5,
+          "v": -0.4
+        },
+        {
+          "type": "hoop",
+          "f": 0.75,
+          "v": 0.4
+        },
+        {
+          "type": "hoop",
+          "f": 1,
+          "v": -0.4
+        }
+      ],
+      "name": "Reifen-Prellen",
+      "task": "In jedem Reifen 1-mal prellen.",
+      "badge": null,
+      "arrows": [],
+      "pin": null
+    },
+    {
+      "ref": "pass-wand",
+      "kind": "lane",
+      "capacity": 3,
+      "spots": "along",
+      "path": "straight",
+      "length": 2,
+      "minLength": 2,
+      "maxLength": 3,
+      "items": [
+        {
+          "type": "disc",
+          "f": 0.5,
+          "v": 0.6
+        }
+      ],
+      "arrows": [
+        {
+          "kind": "pass",
+          "from": {
+            "f": 0.5,
+            "v": 0.2
+          },
+          "to": {
+            "f": 0.5,
+            "v": -2.4
+          }
+        }
+      ],
+      "name": "Pass an die Wand",
+      "task": "An einen freien Teller stellen. 5 Pässe gegen die Wand und den Ball fangen.",
+      "badge": null,
+      "pin": null
+    },
+    {
+      "ref": "ball-um-koerper",
+      "kind": "lane",
+      "capacity": 1,
+      "flow": true,
+      "spotStep": 1.5,
+      "path": "straight",
+      "length": 15,
+      "minLength": 5,
+      "maxLength": 20,
+      "items": [
+        {
+          "type": "cone",
+          "f": 1,
+          "v": 0
+        }
+      ],
+      "name": "Ball um den Körper",
+      "task": "Bis zum Hütchen gehen. Dabei den Ball um Bauch, Knie oder Kopf kreisen lassen.",
+      "badge": null,
+      "arrows": [],
+      "pin": null
+    },
+    {
+      "ref": "abwehrschritte",
+      "kind": "lane",
+      "capacity": 1,
+      "flow": true,
+      "spotStep": 1.5,
+      "path": "straight",
+      "length": 15,
+      "minLength": 4,
+      "maxLength": 15,
+      "items": [
+        {
+          "type": "cone",
+          "f": 0,
+          "v": 0
+        },
+        {
+          "type": "cone",
+          "f": 1,
+          "v": 0
+        }
+      ],
+      "name": "Abwehrschritte seitwärts",
+      "task": "Ball in beide Hände nehmen. Seitwärts bis zum Hütchen. Füße nicht kreuzen.",
+      "badge": null,
+      "arrows": [],
+      "pin": null
+    },
+    {
+      "ref": "zielwurf",
+      "kind": "goal",
+      "capacity": 1,
+      "action": {
+        "u": 9,
+        "v": 0
+      },
+      "target": {
+        "u": 0,
+        "v": 0
+      },
+      "targetKind": "throw",
+      "items": [
+        {
+          "type": "cone",
+          "u": 7.5,
+          "v": -0.8
+        },
+        {
+          "type": "cone",
+          "u": 7.5,
+          "v": 0.8
+        },
+        {
+          "type": "hoop",
+          "u": -0.5,
+          "v": -0.9,
+          "size": 0.7
+        },
+        {
+          "type": "hoop",
+          "u": -0.5,
+          "v": 0.9,
+          "size": 0.7
+        }
+      ],
+      "name": "Zielwurf",
+      "task": "Zur Wurfstelle prellen. Durch die 2 Hütchen auf die Reifen im Tor werfen. Erst werfen, wenn das Tor frei ist.",
+      "badge": null,
+      "arrows": [],
+      "approach": null,
+      "exitCtrl": null
+    }
+  ]
+}

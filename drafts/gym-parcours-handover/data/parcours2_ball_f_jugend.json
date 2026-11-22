@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "title": "Ball-Parkour F-Jugend",
+  "language": "de",
+  "court": { "length": 40, "width": 20, "unit": "m", "wallsAtLines": true },
+  "group": { "name": "F-Jugend", "children": 23 },
+  "startIntervalSeconds": 5,
+  "start": { "x": 7, "y": 1.5, "w": 5, "h": 1.2, "label": "Start / Ziel" },
+  "extraItems": [
+    { "type": "ballbox", "x": 2.5, "y": 1.5, "w": 2, "h": 1, "label": "Bälle", "count": 15 }
+  ],
+  "stations": [
+    {
+      "number": 1,
+      "name": "Slalom prellen",
+      "task": "Ball aus der Kiste nehmen. Prellend um die Hütchen laufen. Schwerer: mit der schwachen Hand.",
+      "skills": ["dribbling"],
+      "capacity": 1,
+      "label": { "x": 16, "y": 3.24 },
+      "items": [
+        { "type": "cone", "x": 12, "y": 1.5 },
+        { "type": "cone", "x": 14, "y": 1.5 },
+        { "type": "cone", "x": 16, "y": 1.5 },
+        { "type": "cone", "x": 18, "y": 1.5 },
+        { "type": "cone", "x": 20, "y": 1.5 }
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Reifen-Prellen",
+      "task": "In jedem Reifen 1-mal prellen.",
+      "skills": ["dribbling"],
+      "capacity": 1,
+      "label": { "x": 24.8, "y": 3.24 },
+      "items": [
+        { "type": "hoop", "x": 22, "y": 1.1 },
+        { "type": "hoop", "x": 23.5, "y": 1.9 },
+        { "type": "hoop", "x": 25, "y": 1.1 },
+        { "type": "hoop", "x": 26.5, "y": 1.9 },
+        { "type": "hoop", "x": 28, "y": 1.1 }
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Pass an die Wand",
+      "task": "An einen freien Teller stellen. 5 Pässe gegen die Stirnwand und den Ball fangen.",
+      "skills": ["passing"],
+      "capacity": 3,
+      "label": { "x": 31.07, "y": 5.5 },
+      "zone": { "x": 38.05, "y": 5.4, "w": 3.7, "h": 6 },
+      "items": [
+        { "type": "disc", "x": 37.5, "y": 3.5 },
+        { "type": "disc", "x": 37.5, "y": 5.5 },
+        { "type": "disc", "x": 37.5, "y": 7.5 }
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Ball um den Körper",
+      "task": "Bis zur Mittellinie gehen. Dabei den Ball um den Bauch kreisen lassen.",
+      "skills": ["ballFeeling"],
+      "capacity": 3,
+      "label": { "x": 27.75, "y": 17.94 },
+      "items": [
+        { "type": "cone", "x": 20, "y": 19 }
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Abwehrschritte seitwärts",
+      "task": "Ball in beide Hände nehmen. Seitwärts an der Seitenlinie bis zum Hütchen an der 9-m-Linie. Füße nicht kreuzen.",
+      "skills": ["defence"],
+      "capacity": 3,
+      "label": { "x": 12.5, "y": 17.94 },
+      "items": [
+        { "type": "cone", "x": 5, "y": 19 }
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Zielwurf",
+      "task": "An der 9-m-Linie entlang zur Mitte prellen. Durch die 2 Hütchen auf die Reifen im Tor werfen. Ohne Ball zurück zum Start.",
+      "skills": ["dribbling", "throwing"],
+      "capacity": 1,
+      "label": { "x": 12.05, "y": 10 },
+      "items": [
+        { "type": "cone", "x": 7.5, "y": 9.2 },
+        { "type": "cone", "x": 7.5, "y": 10.8 },
+        { "type": "hoop", "x": -0.5, "y": 9.1, "size": 0.7, "note": "im Tor aufgehängt" },
+        { "type": "hoop", "x": -0.5, "y": 10.9, "size": 0.7, "note": "im Tor aufgehängt" }
+      ]
+    }
+  ],
+  "path": [
+    { "kind": "run", "points": [[9.5, 1.5], [12, 1.5]] },
+    { "kind": "run", "points": [[20, 1.5], [22, 1.5]] },
+    { "kind": "run", "points": [[28, 1.5], [35.3, 1.5], [35.3, 8.6]] },
+    { "kind": "pass", "points": [[37.9, 3.5], [39.9, 3.5]] },
+    { "kind": "pass", "points": [[37.9, 5.5], [39.9, 5.5]] },
+    { "kind": "pass", "points": [[37.9, 7.5], [39.9, 7.5]] },
+    { "kind": "run", "points": [[35.3, 8.6], [35.3, 19], [20, 19]] },
+    { "kind": "run", "points": [[20, 19], [5, 19]] },
+    { "kind": "runArc", "center": [0, 11.5], "radius": 9, "from": [5.53, 18.6], "to": [9, 11.5], "then": [[9, 10.4]] },
+    { "kind": "throw", "points": [[9, 10], [0, 10]] },
+    { "kind": "run", "points": [[9, 10], [9, 2.1]] }
+  ],
+  "notes": [
+    { "x": 0.3, "y": 12.6, "text": "Helfer neben dem Tor sammelt die Bälle" },
+    { "legend": true, "text": "1 Helfer am Tor. Erst werfen, wenn das Tor frei ist." }
+  ]
+}
