@@ -18,8 +18,8 @@ The interface is in German and English.
 - **Step-by-step building:** pick a station from the catalog. It goes on a lane 2.5 m inside the walls, after the selected station.
 - **Goal stations:** at most one in front of each goal. They have a throw spot and a run path that you can bend.
 - **Age groups (Jugend):** choose Super-Minis, Minis or F- to A-Jugend under "Gruppe & Halle". The catalog and the templates then show only what suits this age group. The station catalog and the equipment palette appear after you choose an age group.
-- **Catalog with 76 stations:** dribbling, ball feeling, passing, throwing, defence, movement and athletics. Examples:
-  - Super-Minis and Minis: animal walks, balloon, rolling the ball into the goal.
+- **Catalog with 81 stations:** dribbling, ball feeling, passing, throwing, defence, movement and athletics. Examples:
+  - Super-Minis and Minis: animal walks, balloon, bowling, bean bags, scooter board, rolling the ball into the goal.
   - E- and D-Jugend: body feints, dribbling two balls, defence square, three-step shot, fast break.
   - C- to A-Jugend: planks, box jumps, medicine ball, shuttle sprint, Kempa trick.
   The stations follow common youth handball exercises, for example from the BWHV/HVW Kinderhandball catalog.
@@ -52,17 +52,21 @@ The interface is in German and English.
   - **Meine Parcours** (my parcours): keep several parcours in the browser.
   - Save and load the parcours as a JSON file.
   - **Aufbau** (set-up): a checklist for the phone that shows the equipment station by station.
-- **10 ready-made parcours** ("Vorlage laden"). The list shows only the templates for the chosen age group:
-  - Bewegungs-Parcours
-  - Ball-Parcours
-  - Koordinations-Parcours
-  - Prellen & Werfen
-  - Turnhallen-Abenteuer
-  - Mit wenig Material (only cones, hoops and discs)
-  - Pass- und Wurf-Zirkel
-  - Bewegungslandschaft Super-Minis
-  - Technik-Parcours E/D-Jugend
-  - Athletik-Zirkel C–A-Jugend (station circuit)
+- **16 ready-made parcours** ("Vorlage laden"), at least 4 for each age group. The list shows only the templates for the chosen age group:
+
+  | Template | Age groups |
+  |---|---|
+  | Bewegungslandschaft Super-Minis, Ballspaß für die Kleinsten, Klettern, Rollen, Rutschen | Super-Minis, Minis |
+  | Turnhallen-Abenteuer | Super-Minis to F |
+  | Bewegungs-Parcours, Mit wenig Material (only cones, hoops and discs) | Minis to E |
+  | Ball-Parcours, Prellen & Werfen | F, E |
+  | Koordinations-Parcours, Pass- und Wurf-Zirkel | F to D |
+  | Technik-Parcours E/D-Jugend | E, D |
+  | Wurf- und Technik-Parcours | D to B |
+  | Abwehr & schnelle Beine | D to A |
+  | Athletik-Zirkel, Sprungkraft & Schnelligkeit (both station circuits), Handball-Parcours C–A | C to A |
+
+  A template sets its own start interval and format where it needs them (for example 8 s for the older groups, or the station circuit for athletics).
 - **Your own stations:** save a changed station as your own (☆). Export your stations as a file and import them in another browser to share them with other coaches.
 
 ## Use it

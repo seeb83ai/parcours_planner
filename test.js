@@ -208,7 +208,7 @@ check('import rejects broken corners', (() => { try { M.validate({ ...vp, finish
 check('every station has a valid age range', CATALOG.every(c => c.ages && M.AGES.indexOf(c.ages[0]) >= 0 && M.AGES.indexOf(c.ages[0]) <= M.AGES.indexOf(c.ages[1])));
 for (const g of M.AGES) {
   const list = CATALOG.filter(c => forAge(c, g));
-  check(`${g}: >= 20 stations, >= 2 goal stations, a template`, list.length >= 20 && list.filter(c => c.kind === 'goal').length >= 2 && PRESETS.some(d => forAge(d, g)));
+  check(`${g}: >= 20 stations, >= 2 goal stations, >= 4 templates`, list.length >= 20 && list.filter(c => c.kind === "goal").length >= 2 && PRESETS.filter(d => forAge(d, g)).length >= 4);
 }
 check('no age group = all stations', CATALOG.every(c => forAge(c, '')));
 check('old group text is mapped', M.ageKey('F-Jugend') === 'F' && M.ageKey('Super-Minis') === 'superminis' && M.ageKey('Minis') === 'minis'

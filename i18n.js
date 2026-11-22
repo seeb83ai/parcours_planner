@@ -72,7 +72,7 @@ const DICT = {
     'item.cone': 'Hütchen', 'item.hoop': 'Reifen', 'item.disc': 'Markierungsteller', 'item.helper': 'Helfer',
     'item.bench': 'Bank', 'item.kastendeckel': 'Kastendeckel', 'item.mat': 'Matte', 'item.weichboden': 'Weichboden',
     'item.ballbox': 'Ballkiste', 'item.minigoal': 'Mini-Tor', 'item.balls': 'Bälle',
-    'item.kasten': 'Kasten', 'item.hurdle': 'Minihürde', 'item.ladder': 'Koordinationsleiter', 'item.rope': 'Zauberschnur', 'item.tunnel': 'Kriechtunnel', 'item.tau': 'Tau', 'item.sprossenwand': 'Sprossenwand',
+    'item.kasten': 'Kasten', 'item.hurdle': 'Minihürde', 'item.ladder': 'Koordinationsleiter', 'item.rope': 'Zauberschnur', 'item.tunnel': 'Kriechtunnel', 'item.tau': 'Tau', 'item.sprossenwand': 'Sprossenwand', 'item.beanbag': 'Sandsäckchen', 'item.trampolin': 'Minitrampolin', 'item.rollbrett': 'Rollbrett',
   },
   en: {
     'tb.help': 'Help', 'help.close': 'Close', 'help.title': 'How the parcours planner works', 'help.keys': 'Keyboard shortcuts',
@@ -147,7 +147,7 @@ const DICT = {
     'item.cone': 'Cone', 'item.hoop': 'Hoop', 'item.disc': 'Marker disc', 'item.helper': 'Helper',
     'item.bench': 'Bench', 'item.kastendeckel': 'Box top', 'item.mat': 'Mat', 'item.weichboden': 'Crash mat',
     'item.ballbox': 'Ball box', 'item.minigoal': 'Mini goal', 'item.balls': 'Balls',
-    'item.kasten': 'Vaulting box', 'item.hurdle': 'Mini hurdle', 'item.ladder': 'Agility ladder', 'item.rope': 'Rope', 'item.tunnel': 'Crawl tunnel', 'item.tau': 'Climbing rope', 'item.sprossenwand': 'Wall bars',
+    'item.kasten': 'Vaulting box', 'item.hurdle': 'Mini hurdle', 'item.ladder': 'Agility ladder', 'item.rope': 'Rope', 'item.tunnel': 'Crawl tunnel', 'item.tau': 'Climbing rope', 'item.sprossenwand': 'Wall bars', 'item.beanbag': 'Bean bag', 'item.trampolin': 'Mini trampoline', 'item.rollbrett': 'Scooter board',
   },
 };
 

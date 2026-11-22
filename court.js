@@ -9,6 +9,7 @@ const COL = {
   weichboden: ['#1e3a8a', '#1e3a8a'], ballbox: ['#fde68a', '#b45309'], minigoal: ['#ffffff', '#374151'],
   kasten: ['#d6b58a', '#7c5a2e'], hurdle: ['#ef4444', '#991b1b'], ladder: ['#fef9c3', '#a16207'],
   rope: ['#475569', '#475569'], tunnel: ['#86efac', '#15803d'], tau: ['#d6b58a', '#78350f'], sprossenwand: ['#e7c9a0', '#7c5a2e'],
+  beanbag: ['#fca5a5', '#b91c1c'], trampolin: ['#374151', '#2563eb'], rollbrett: ['#c4b5fd', '#5b21b6'],
 };
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = v => +v.toFixed(3);
@@ -46,7 +47,7 @@ function shape(it) {
   const across = xs => xs.map(x => `<line x1="${n(x)}" y1="${-h / 2}" x2="${n(x)}" y2="${h / 2}" stroke="${stroke}" stroke-width="0.04"/>`).join('');
   const extra = it.type === 'ladder' || it.type === 'sprossenwand' ? across(Array.from({ length: Math.round(w / 0.45) - 1 }, (_, k) => -w / 2 + (k + 1) * w / Math.round(w / 0.45)))
     : it.type === 'kasten' ? across([-w / 6, w / 6]) : '';
-  return `<rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="${it.type === 'tunnel' ? 0.3 : 0.08}" fill="${fill}" stroke="${stroke}" stroke-width="0.05"/>${extra}`;
+  return `<rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="${it.type === 'tunnel' || it.type === 'trampolin' ? 0.3 : 0.08}" fill="${fill}" stroke="${stroke}" stroke-width="0.05"/>${extra}`;
 }
 // Labels stay upright, whatever the item rotation.
 const label = (it, t) => ({

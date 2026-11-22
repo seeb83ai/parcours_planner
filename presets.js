@@ -39,23 +39,47 @@ export const PRESETS = [
     stations: [['pass-wand'], ['huetchen-abwerfen', { capacity: 2 }], ['schnur-werfen'], ['korbwurf', { capacity: 2 }], ['torhueter'],
       ['pass-kasten', { capacity: 2 }], ['ball-um-koerper'], ['slalom-prellen'], ['wurf-ueber-schnur']] },
   // Super-Minis and Minis: crawling, climbing, rolling, animal walks, first ball contact
-  { id: 'superminis', ages: 'superminis-minis', title: T('Bewegungslandschaft Super-Minis', 'Movement landscape for super minis'), children: 12,
+  { id: 'superminis', ages: 'superminis-minis', title: T('Bewegungslandschaft Super-Minis', 'Movement landscape for super minis'), children: 12, interval: 8,
     stations: [['tierwege'], ['balancieren'], ['bank-kriechen', { length: 3 }], ['ball-ins-tor'],
       ['wackelberg'], ['kriechtunnel'], ['purzelbaum'], ['luftballon'], ['ball-transport']] },
   // E/D: dribbling, feints, defence footwork, throwing technique
-  { id: 'technik', ages: 'E-D', title: T('Technik-Parcours E/D-Jugend', 'Technique parcours U11/U13'), children: 16, free: BALLS,
+  { id: 'technik', ages: 'E-D', title: T('Technik-Parcours E/D-Jugend', 'Technique parcours U11/U13'), children: 16, interval: 8, free: BALLS,
     stations: [['taeuschung'], ['zwei-baelle'], ['wandpass-lauf'], ['dreischritt-wurf'],
-      ['abwehr-viereck'], ['koordinationsleiter'], ['achterlauf'], ['seilspringen', { capacity: 3 }], ['gegenstoss']] },
+      ['abwehr-viereck', { capacity: 2 }], ['koordinationsleiter'], ['achterlauf', { capacity: 2 }], ['seilspringen', { capacity: 3 }], ['gegenstoss']] },
   // C to A: athletics circuit, every station 45 s – change
   { id: 'athletik', ages: 'C-A', title: T('Athletik-Zirkel C–A-Jugend', 'Athletics circuit U15–U19'), children: 16, mode: 'zirkel', rotation: 2,
     stations: [['stuetz'], ['box-jumps'], ['medizinball'], ['pendelsprint'], ['lauf-abc'],
       ['bank-hopser'], ['abwehr-viereck'], ['seilspringen', { capacity: 3 }], ['koordinationsleiter']] },
+  // Super-Minis / Minis: first ball contact – rolling, carrying, aiming with soft things
+  { id: 'ballspass', ages: 'superminis-minis', title: T('Ballspaß für die Kleinsten', 'Ball fun for the youngest'), children: 12, interval: 8, free: BALLS,
+    stations: [['luftballon'], ['ball-rollen'], ['kegeln', { capacity: 2 }], ['ball-ins-tor'],
+      ['ball-transport'], ['sandsack-zielwurf', { capacity: 2 }], ['ball-bank-rollen'], ['ball-um-koerper']] },
+  // Super-Minis / Minis: climbing, rolling, sliding (wall bars at the top wall)
+  { id: 'klettern', ages: 'superminis-minis', title: T('Klettern, Rollen, Rutschen', 'Climb, roll, slide'), children: 12, interval: 8,
+    stations: [['sprossenwand-klettern'], ['rollbrett', { capacity: 2 }], ['schraege-bank'], ['kriechtunnel'],
+      ['baumstammrolle'], ['weichboden-berg'], ['tierwege'], ['purzelbaum']] },
+  // D to B: throwing technique on the way, two goal stations
+  { id: 'wurf-technik', ages: 'D-B', title: T('Wurf- und Technik-Parcours', 'Throwing & technique parcours'), children: 16, interval: 8, free: BALLS,
+    stations: [['wandpass-lauf'], ['taeuschung'], ['zwei-baelle'], ['dreischritt-wurf'],
+      ['abwehr-viereck', { capacity: 2 }], ['pendelsprint', { capacity: 2 }], ['koordinationsleiter'], ['rueckraumwurf']] },
+  // D to A: defence footwork and quick feet, fast break at the end
+  { id: 'abwehr', ages: 'D-A', title: T('Abwehr & schnelle Beine', 'Defence & quick feet'), children: 16, interval: 8, free: BALLS,
+    stations: [['abwehrschritte'], ['abwehr-viereck', { capacity: 2 }], ['lauf-abc'], ['gegenstoss'],
+      ['bank-hopser'], ['koordinationsleiter'], ['seilspringen', { capacity: 3 }], ['pendelsprint', { capacity: 2 }]] },
+  // C to A: jumping power and speed as a circuit
+  { id: 'sprungkraft', ages: 'C-A', title: T('Sprungkraft & Schnelligkeit', 'Jumping power & speed'), children: 16, mode: 'zirkel', rotation: 2,
+    stations: [['box-jumps'], ['huerdenlauf'], ['bank-hopser'], ['kempa'],
+      ['seilspringen', { capacity: 3 }], ['pendelsprint'], ['lauf-abc'], ['sprungwurf']] },
+  // C to A: game-like handball parcours
+  { id: 'spielnah', ages: 'C-A', title: T('Handball-Parcours C–A-Jugend', 'Handball parcours U15–U19'), children: 16, interval: 8, mode: 'parcours', free: BALLS,
+    stations: [['wandpass-lauf'], ['taeuschung'], ['zwei-baelle'], ['gegenstoss'],
+      ['abwehr-viereck', { capacity: 2 }], ['zickzack-prellen'], ['pass-wand', { capacity: 3 }], ['doppelpass-tor']] },
 ];
 
 for (const d of PRESETS) d.ages = d.ages.split('-');
 
 export function buildPreset(def, lang) {
-  const p = { ...emptyParcours(), title: def.title[lang] ?? def.title.de, children: def.children ?? 20, free: structuredClone(def.free ?? []),
+  const p = { ...emptyParcours(), title: def.title[lang] ?? def.title.de, children: def.children ?? 20, interval: def.interval ?? 5, free: structuredClone(def.free ?? []),
     group: def.ages[0], mode: def.mode ?? 'parcours', rotation: def.rotation ?? 3 };
   for (const [ref, o = {}] of def.stations) {
     const st = newStation(CATALOG.find(c => c.ref === ref), lang);

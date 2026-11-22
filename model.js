@@ -39,6 +39,7 @@ export const ITEM_TYPES = {
   weichboden: { w: 2, h: 3 }, ballbox: { w: 2, h: 1 }, minigoal: { w: 0.6, h: 1.8 },
   kasten: { w: 1.5, h: 0.9 }, hurdle: { w: 0.15, h: 0.8 }, ladder: { w: 4, h: 0.5 }, rope: { w: 0.06, h: 3 },
   tunnel: { w: 2, h: 0.7 }, tau: { r: 0.3 }, sprossenwand: { w: 2, h: 0.25 },
+  beanbag: { r: 0.15 }, trampolin: { w: 1.1, h: 1.1 }, rollbrett: { w: 0.6, h: 0.4 },
 };
 
 const cs = deg => { const r = deg * Math.PI / 180; return [Math.round(Math.cos(r) * 1e9) / 1e9, Math.round(Math.sin(r) * 1e9) / 1e9]; };
