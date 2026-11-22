@@ -43,7 +43,11 @@ check('fixed bench keeps u', M.itemU(st('balancieren', { length: 99 }), st('bala
 // pinned station leaves the lane flow
 lay = M.layout(P([st('balancieren', { pin: { x: 20, y: 10, rot: 90 } }), st('balancieren')]));
 check('pinned keeps its frame', lay[0].pinned && near(lay[0].exit, { x: 20, y: 14 }));
-check('next station takes the free lane slot', near(lay[1].frame, { x: I + 6, y: I }));
+check('next station continues after the pinned one', lay[1].side === 2 && near(lay[1].frame, { x: 18, y: 20 - I })); // pinned exit (20,14) -> bottom
+// pinned stations after a goal: a new station goes behind the last one, not into the free corner slot
+const after = [st('slalom-prellen'), st('zielwurf'), st('baumstammrolle', { pin: { x: 32.5, y: 20 - I, rot: 180 } }), st('baumstammrolle')];
+lay = M.layout(P(after));
+check('new station after a pinned one, not in the corner', near(lay[3].frame, { x: 32.5 - 3 - 2, y: 20 - I }));
 
 // transforms are inverse
 const fr = { x: 38.5, y: 18.5, rot: 180 }, w = M.toWorld(fr, 3, 1), l = M.toLocal(fr, w.x, w.y);
@@ -69,6 +73,25 @@ const gs = st('zielwurf'), gl = M.layout(P([gs]))[0];
 M.rotateStation(gs, structuredClone(gs), gl, M.toWorld(gl.frame, 9, 0), 180);
 check('goal station rotated around the throw spot', gs.action.u === 9 && gs.items[0].u === 10.5 && gs.items[0].rot === 180);
 check('norm wraps negative angles', M.norm(-15) === 345);
+
+// resizing keeps at least the original spacing of spread rows
+const cones = s => s.items.filter(it => it.type === 'cone');
+const sz = st('slalom-prellen'); // 5 cones over 10 m = 2.5 m pitch
+M.resize(sz, 14);
+check('longer slalom gets a 6th cone (2.8 m apart)', cones(sz).length === 6 && sz.length === 14);
+M.resize(sz, 6);
+check('shorter slalom drops to 3 cones', cones(sz).length === 3);
+M.resize(sz, 10);
+check('back to 10 m gives 5 cones again', cones(sz).length === 5);
+const zz = st('zickzack-prellen');
+M.resize(zz, 14);
+check('zigzag keeps alternating sides', cones(zz).length === 6 && cones(zz).sort((a, b) => a.f - b.f).every((c, i) => c.v === (i % 2 ? 1 : -1)));
+const rw = st('rueckwaerts');
+M.resize(rw, 10);
+check('cone gates grow as pairs', cones(rw).length === 6 && new Set(cones(rw).map(c => c.f)).size === 3);
+const bal = st('balancieren', { minLength: 4, maxLength: 8 });
+M.resize(bal, 8);
+check('fixed items are not multiplied', bal.items.length === 1);
 
 // places (Plätze): along makes the station longer, across adds parallel tracks; material multiplies
 const pw = st('pass-wand'); // 3 places along, 2 m each

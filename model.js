@@ -43,6 +43,32 @@ export const span = st => st.length * (st.spots === 'along' ? places(st) : 1);
 export const spotOffsets = st => Array.from({ length: places(st) }, (_, k) =>
   (st.spots === 'along' ? { du: k * st.length, dv: 0 } : { du: 0, dv: k * (st.spotStep ?? 2) }));
 
+// Change a lane station's length. Rows of evenly spread items (same type, `f` set) keep at least
+// their original spacing (`pitch`, stored on first resize): an item is added as soon as it fits,
+// and removed when it no longer does. Items at the same `f` (e.g. a cone gate) move as one slot.
+export function resize(st, len) {
+  st.pitch ??= {};
+  const groups = {};
+  for (const it of st.items) if (it.f != null) (groups[it.type] ??= []).push(it);
+  for (const [type, items] of Object.entries(groups)) {
+    const fs = [...new Set(items.map(it => it.f))].sort((a, b) => a - b);
+    const slots = fs.map(f => items.filter(it => it.f === f));
+    const f0 = fs[0], df = fs.at(-1) - f0;
+    if (slots.length < 2 || df <= 0) continue;
+    const pitch = st.pitch[type] ??= r3(df * st.length / (slots.length - 1));
+    const n = Math.max(2, Math.floor(df * len / pitch + 1e-6) + 1);
+    if (n === slots.length) continue;
+    // repeat the slot pattern (e.g. alternating zigzag) with its shortest period
+    const sig = sl => sl.map(it => it.v).join();
+    let per = 1;
+    while (slots.some((sl, i) => sig(sl) !== sig(slots[i % per]))) per++;
+    const next = Array.from({ length: n }, (_, i) =>
+      slots[i % per].map(it => ({ ...it, f: r3(f0 + df * i / (n - 1)) }))).flat();
+    st.items = st.items.filter(it => !(it.f != null && it.type === type)).concat(next);
+  }
+  st.length = len;
+}
+
 // Place every station. Returns one entry per station:
 // { fits, frame, entry, exit, side, goal?, pinned? }
 export function layout(p) {
@@ -56,8 +82,16 @@ export function layout(p) {
       return { fits: true, goal: true, side: gs, frame, entry: null, exit: toWorld(frame, st.action.u, st.action.v) };
     }
     if (st.pin) {
-      const frame = st.pin;
-      return { fits: true, pinned: true, frame, entry: { x: frame.x, y: frame.y }, exit: toWorld(frame, span(st), 0) };
+      const frame = st.pin, entry = { x: frame.x, y: frame.y }, exit = toWorld(frame, span(st), 0);
+      // a pinned station still marks a place on the lane: the next station continues after it
+      const s = Math.max(project(entry).s, project(exit).s);
+      const cur = side >= 4 ? LAP : SIDES.slice(0, side).reduce((a, S) => a + S.len, 0) + pos;
+      if (s > cur + 1e-9) {
+        let k = 0, u = s;
+        while (k < 3 && u > SIDES[k].len + 1e-9) { u -= SIDES[k].len; k++; }
+        side = k; pos = u;
+      }
+      return { fits: true, pinned: true, frame, entry, exit };
     }
     let start = pos + GAP;
     const len = span(st);

@@ -151,11 +151,16 @@ export function courtInner(p, opts) {
   // handles of the selected station
   if (edit && S != null) {
     const st = p.stations[S], L = lay[S];
-    const h = (q, kind, title) => `<circle data-drag="${kind}" data-st="${S}" cx="${n(q.x)}" cy="${n(q.y)}" r="0.4" fill="#fff" stroke="#0f766e" stroke-width="0.1" style="cursor:grab"><title>${esc(title)}</title></circle>`;
+    // start and end border of a resizable lane station: drag to change the length
     if (st.kind === 'lane' && st.maxLength > st.minLength) {
-      const q = toWorld(L.frame, span(st), 0);
-      o.push(`<rect data-drag="len" data-st="${S}" x="${n(q.x - 0.35)}" y="${n(q.y - 0.35)}" width="0.7" height="0.7" fill="#fff" stroke="#0f766e" stroke-width="0.1" style="cursor:ew-resize"><title>${esc(t('handle.length'))}</title></rect>`);
+      const vs = [0, ...spotOffsets(st).flatMap(of => st.items.map(it => it.v + of.dv))];
+      const v1 = Math.min(...vs) - 1.2, v2 = Math.max(...vs) + 1.2;
+      const cur = (L.frame.rot % 180 === 0) ? 'ew-resize' : 'ns-resize';
+      for (const [kind, u] of [['lenstart', 0], ['len', span(st)]])
+        o.push(`<rect data-drag="${kind}" data-st="${S}" transform="translate(${pt(L.frame)}) rotate(${L.frame.rot})" x="${n(u - 0.18)}" y="${n(v1)}" width="0.36" height="${n(v2 - v1)}"
+ rx="0.12" fill="#0f766e" fill-opacity="0.35" style="cursor:${cur}"><title>${esc(t('handle.length'))}</title></rect>`);
     }
+    const h = (q, kind, title) => `<circle data-drag="${kind}" data-st="${S}" cx="${n(q.x)}" cy="${n(q.y)}" r="0.4" fill="#fff" stroke="#0f766e" stroke-width="0.1" style="cursor:grab"><title>${esc(title)}</title></circle>`;
     const b = stationBox(st, L);
     o.push(rotHandle({ x: b.x2, y: b.y1 }, `data-drag="rotst" data-st="${S}"`, t('handle.rotate')));
     const it = st.items[sel.item];

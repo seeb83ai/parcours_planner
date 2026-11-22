@@ -19,6 +19,7 @@ Reference material: `drafts/` (handover with learnings, old scripts, design draf
 | 9 | Extra material | Station selected → item joins the station (moves with it). Nothing selected → free item. Palette: handover items + Helfer + Mini-Tor. |
 | 10 | Templates | Parcours 1 + 2 rebuilt in the new format (Parcours 1 now clockwise). No import of schemaVersion 1. |
 | 12 | Plätze | Station items describe one place. Plätze repeats them side by side (`spots: 'across'`, parallel tracks `spotStep` m apart) or one after another (`spots: 'along'`, station becomes Plätze × length). Copies are derived, so material edits apply to every place, and the material list multiplies. Goal stations: number only. `flow: true` = walk-through station with no queue warning. |
+| 13 | Length & pins | Drag the start/end border or use the slider. Rows of spread items (`f`) keep at least their original spacing (`pitch`, stored on first resize), so items are added/removed as the length changes; same-`f` items (cone gates) move as one slot. Dragging the start border pins the station with its end fixed. Pinned stations still advance the lane cursor: the next station goes after the last one. A click without real movement never pins. |
 | 11 | Misc | Undo/redo (50). GitHub Pages now, nginx on a Raspberry Pi later (all paths relative). i18n DE/EN (`i18n.js`). Modern browsers only. `test.html` for layout logic. |
 
 ## Coordinates

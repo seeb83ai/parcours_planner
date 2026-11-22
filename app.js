@@ -261,7 +261,11 @@ svg.addEventListener('pointermove', e => {
     if (o.f != null && st.length) it.f = r3((l.u - du) / st.length); else it.u = r3(l.u - du);
     it.v = r3(l.v - dv);
   }
-  if (kind === 'station' && st.kind === 'lane') st.pin = { x: M.snap(L.frame.x + dx), y: M.snap(L.frame.y + dy), rot: L.frame.rot };
+  if (kind === 'station' && st.kind === 'lane') {
+    const x = M.snap(L.frame.x + dx), y = M.snap(L.frame.y + dy);
+    // a click with a little jitter must not pin the station
+    st.pin = x === L.frame.x && y === L.frame.y ? stO.pin : { x, y, rot: L.frame.rot };
+  }
   if (kind === 'station' && st.kind === 'goal') {
     const d = M.toLocal({ x: 0, y: 0, rot: L.frame.rot }, dx, dy), du = M.snap(d.u), dv = M.snap(d.v);
     const mv = (a, b) => { if (a) Object.assign(b, { u: r3(a.u + du), v: r3(a.v + dv) }); };
@@ -270,7 +274,18 @@ svg.addEventListener('pointermove', e => {
     mv(stO.approach, st.approach);
   }
   if (kind === 'badge') { const b = badgePos(stO, L); st.badge = { x: M.snap(b.x + dx), y: M.snap(b.y + dy) }; }
-  if (kind === 'len') st.length = M.clamp(M.snap(M.toLocal(L.frame, q.x, q.y).u * st.length / M.span(st)), st.minLength, st.maxLength);
+  if (kind === 'len' || kind === 'lenstart') {
+    // relative to where the border was grabbed; the start border keeps the end in place (pins)
+    const du = M.toLocal(L.frame, q.x, q.y).u - M.toLocal(L.frame, drag.p0.x, drag.p0.y).u;
+    const spanO = M.span(stO), mult = spanO / stO.length;
+    const len = M.clamp(M.snap((spanO + (kind === 'len' ? du : -du)) / mult), st.minLength, st.maxLength);
+    M.resize(st, len);
+    if (kind === 'lenstart') {
+      const o = M.toWorld(L.frame, spanO - len * mult, 0);
+      st.pin = len === stO.length ? stO.pin : { x: r3(o.x), y: r3(o.y), rot: L.frame.rot };
+    }
+    sel.item = undefined;
+  }
   if (kind === 'action') st.action = local(q.x, q.y);
   if (kind === 'approach' || kind === 'exitCtrl') st[kind] = local(q.x, q.y);
   if (kind.startsWith('rot')) {
@@ -322,7 +337,8 @@ list.addEventListener('input', e => {
   if (f === 'name' || f === 'task') st[f] = e.target.value;
   if (f === 'capacity') st.capacity = M.clamp(parseInt(e.target.value, 10) || 1, 1, 6);
   if (f === 'length') {
-    st.length = M.clamp(+e.target.value, st.minLength, st.maxLength);
+    M.resize(st, M.clamp(+e.target.value, st.minLength, st.maxLength));
+    sel.item = undefined;
     e.target.nextElementSibling.textContent = `${st.length} m`;
   }
   renderCourt();
