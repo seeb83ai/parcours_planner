@@ -86,7 +86,7 @@ Quick start:
 2. Pick a station in the list on the left. It goes onto the lane.
 3. Click a station on the court or in the list to select it. Drag to move it, drag the bar at its start or end to change its length, and use the ↻ handle to rotate it.
 4. Change the name, task text, length and places below the court.
-5. Use **Link teilen**, **PNG** or **Drucken** (print) to share the plan. **Meine Parcours** keeps several parcours in the browser. **JSON speichern** saves the parcours as a file, and **Importieren** loads one.
+5. Use **Link teilen**, **PNG** or **Drucken** (print) to share the plan. **Meine Parcours** keeps several parcours in the browser. **Exportieren** (export) saves the parcours as a JSON file, and **Importieren** loads one.
 
 ### Keyboard
 
