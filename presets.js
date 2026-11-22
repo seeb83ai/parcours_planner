@@ -13,7 +13,7 @@ export const PRESETS = [
       ['baenke-springen', { length: 8 }], ['bank-kriechen', { length: 3 }], ['purzelbaum', { length: 10 }],
       ['seitgalopp'], ['rueckwaerts']] },
   { id: 'ball', title: T('Ball-Parcours F-Jugend', 'Ball parcours U9'), children: 22, free: BALLS,
-    stations: [['slalom-prellen', { length: 14 }], ['reifen-prellen', { length: 10 }], ['pass-wand'],
+    stations: [['slalom-prellen', { length: 14 }], ['reifen-prellen', { length: 10 }], ['pass-wand', { capacity: 4 }],
       ['ball-um-koerper', { length: 15 }], ['abwehrschritte', { length: 15 }], ['zielwurf']] },
   // coordination without balls: ladder, hurdles, hopping, crawling
   { id: 'koordination', title: T('Koordinations-Parcours', 'Coordination parcours'),
@@ -24,7 +24,7 @@ export const PRESETS = [
   // dribbling on the way, throwing at both goals
   { id: 'prellen-werfen', title: T('Prellen & Werfen', 'Dribble & throw'), free: BALLS,
     stations: [['zickzack-prellen'], ['achterlauf', { capacity: 2 }], ['unter-schnur-prellen'], ['aufsetzer'],
-      ['prellen-reifen-stand'], ['ball-bank-rollen'], ['korbwurf', { capacity: 2 }], ['slalom-prellen'], ['sprungwurf-kastendeckel']] },
+      ['prellen-reifen-stand', { capacity: 3 }], ['ball-bank-rollen'], ['korbwurf', { capacity: 2 }], ['slalom-prellen'], ['sprungwurf-kastendeckel']] },
   // gym equipment adventure (5 benches, 1 crash mat, 1 box)
   { id: 'abenteuer', title: T('Turnhallen-Abenteuer', 'Gym adventure'),
     stations: [['balancieren'], ['kasten-sprung'], ['bank-kriechen'], ['tarzan'],
@@ -32,7 +32,7 @@ export const PRESETS = [
       ['bank-ziehen'], ['purzelbaum'], ['baenke-springen'], ['huerdenlauf']] },
   // only cones, hoops, marker discs and balls
   { id: 'wenig-material', title: T('Mit wenig Material', 'Little equipment'), free: BALLS,
-    stations: [['slalom-prellen'], ['reifen-prellen'], ['kaenguru'], ['pass-wand'],
+    stations: [['slalom-prellen'], ['reifen-prellen'], ['kaenguru'], ['pass-wand', { capacity: 4 }],
       ['hochwerfen-fangen'], ['ball-rollen'], ['abwehrschritte'], ['rueckwaerts'], ['zielwurf']] },
   // passing and throwing, goalkeeper at one goal (1 helper)
   { id: 'wurf-zirkel', title: T('Pass- und Wurf-Zirkel', 'Passing & throwing circuit'), free: BALLS,

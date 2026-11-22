@@ -117,11 +117,60 @@ for (const x of FILTERS) check(`filter ${x.id} finds stations`, CATALOG.some(x.f
 const fb = id => CATALOG.filter(FILTERS.find(x => x.id === id).f).length;
 check('with + without ball = all', fb('ball') + fb('noball') === CATALOG.length && fb('noball') > 0);
 
+// hall sizes: lane and goals follow the hall
+const small = { ...M.emptyParcours(), hall: M.HALLS.small, stations: [st('slalom-prellen'), st('slalom-prellen'), st('zielwurf')] };
+lay = M.layout(small);
+check('small hall: 2nd slalom jumps past the 22 m top and 10 m end side', lay[1].side === 2 && lay[2].side === 3);
+check('small hall: right goal at x = 27', near(M.geom(M.HALLS.small).goals[1], { x: 27, y: 7.5 }));
+const half = { ...M.emptyParcours(), hall: M.HALLS.half, stations: [st('balancieren'), st('zielwurf')] };
+lay = M.layout(half);
+check('half court: goal station goes to the only goal (left)', lay[1].side === 3 && near(lay[1].frame, { x: 0, y: 10 }));
+
+// timing: a station slower than the start interval makes a queue
+const tq = { ...M.emptyParcours(), children: 11, interval: 5, stations: [st('balancieren'), st('pass-helfer')] }; // 12 s, 1 place
+const tm = M.timing(tq, M.layout(tq));
+check('queue at the slow station: 10 children x 7 s', tm.jams.length === 1 && tm.jams[0].i === 1 && tm.jams[0].wait === 70);
+tq.stations[1].capacity = 3; // 3 places: 4 s per child < 5 s
+check('more places remove the queue', M.timing(tq, M.layout(tq)).jams.length === 0);
+const zk = { ...M.emptyParcours(), mode: 'zirkel', rotation: 4, children: 20, stations: [st('balancieren'), st('pass-wand'), st('slalom-prellen')] };
+const ci = M.circuit(zk, M.layout(zk));
+check('circuit: 3 groups of 7, 12 minutes', ci.groups === 3 && ci.perGroup === 7 && ci.total === 12);
+check('circuit: no run arrows', M.connectors(zk, M.layout(zk)).length === 0);
+
+// safety: a throw across another station's running path is found, own paths are fine
+const cr = { ...M.emptyParcours(), stations: [st('zielwurf'), st('balancieren', { pin: { x: 35.5, y: 8, rot: 90 } })] };
+lay = M.layout(cr);
+check('throw at the goal crosses a pinned bench path', M.crossings(cr, lay).some(c => c.st === 0));
+check('presets have no crossings', PRESETS.every(d => { const pp = buildPreset(d, 'de'); return !M.crossings(pp, M.layout(pp)).length; }));
+
+// badges avoid material and each other
+const bp = buildPreset(PRESETS.find(d => d.id === 'prellen-werfen'), 'de'), bl = M.layout(bp), bb = M.badges(bp, bl);
+const allItems = bp.stations.flatMap((s, i) => M.placedItems(s, bl[i]).map(c => c.q));
+check('badges keep 1 m from material', bb.every(b => allItems.every(q => Math.hypot(q.x - b.x, q.y - b.y) >= 0.99)));
+
+// a row adjusted by hand only stretches
+const mr = st('slalom-prellen');
+mr.manual = { cone: true };
+M.resize(mr, 14);
+check('manual row is not rebuilt', cones(mr).length === 5 && mr.length === 14);
+
+// equipment check against the hall stock
+const sh = M.shortages(buildPreset(PRESETS.find(d => d.id === 'bewegung'), 'de'), { bench: 4, cone: 99 });
+check('5 benches needed, 4 in stock', sh.length === 1 && sh[0].type === 'bench' && sh[0].n === 5 && sh[0].have === 4);
+
+// own stations file
+check('own stations validate', !(() => { try { M.validateStations([st('pass-wand')]); } catch { return true; } })()
+  && (() => { try { M.validateStations([{ kind: 'lane', items: [{ type: 'rocket' }], length: 2 }]); } catch { return true; } })());
+
 // validation at the import boundary
 const bad = x => { try { M.validate(x); return false; } catch { return true; } };
 check('validate rejects schema 1', bad({ schemaVersion: 1, stations: [] }));
 check('validate rejects unknown item', bad({ ...mp, free: [{ type: 'rocket' }] }));
 check('validate accepts a parcours', !bad(mp));
+
+// share link round trip (async)
+const sp = buildPreset(PRESETS[0], 'de'), code = await M.encodeShare(sp);
+check(`share link survives a round trip (${code.length} chars)`, JSON.stringify(await M.decodeShare(code)) === JSON.stringify(sp) && /^[\w-]+$/.test(code));
 
 const failed = results.filter(([, ok]) => !ok);
 const report = results.map(([n, ok]) => `${ok ? 'ok  ' : 'FAIL'} ${n}`).join('\n') + `\n${results.length - failed.length}/${results.length} passed`;

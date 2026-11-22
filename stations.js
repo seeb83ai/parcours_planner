@@ -164,7 +164,7 @@ export const CATALOG = [
     length: 3, minLength: 3, maxLength: 3, items: [{ type: 'weichboden', u: 1.5, v: 0.5 }],
     name: T('Weichboden-Berg', 'Crash mat mountain'),
     task: T('Über den Weichboden krabbeln oder rollen.', 'Crawl or roll over the crash mat.') },
-  { ref: 'purzelbaum', kind: 'lane', skill: 'movement', capacity: 1, spotStep: 1.5, path: 'straight',
+  { ref: 'purzelbaum', kind: 'lane', skill: 'movement', capacity: 1, flow: true, spotStep: 1.5, path: 'straight',
     length: 8, minLength: 7, maxLength: 10, items: [0.125, 0.5, 0.875].map(f => ({ type: 'mat', f, v: 0 })),
     name: T('Purzelbaum', 'Forward roll'),
     task: T('Auf jeder Matte eine Rolle vorwärts.', 'One forward roll on each mat.') },
@@ -275,6 +275,14 @@ const TAGS = {
   passen: ['doppelpass-tor'],
   ball: ['krebsgang'],
 };
+// Seconds one child needs at a station that is not walk-through (estimate; the coach can change it).
+const SECS = {
+  'pass-wand': 20, 'acht-beine': 15, 'prellen-reifen-stand': 15, achterlauf: 10, 'pass-helfer': 12, 'pass-kasten': 8,
+  'huetchen-abwerfen': 8, korbwurf: 8, 'baelle-abwehren': 12, 'eins-gegen-eins': 6, 'kasten-sprung': 6, tarzan: 8,
+  baumstammrolle: 6, zielwurf: 6, sprungwurf: 6, 'sprungwurf-kastendeckel': 6, aufsetzer: 5, 'wurf-ueber-schnur': 5,
+  'kegel-im-tor': 6, torhueter: 8, 'doppelpass-tor': 8,
+};
+for (const [ref, secs] of Object.entries(SECS)) CATALOG.find(c => c.ref === ref).secs = secs;
 for (const [tag, refs] of Object.entries(TAGS)) for (const r of refs) (CATALOG.find(c => c.ref === r).tags ??= []).push(tag);
 
 // Catalog filter (dropdown). Works on catalog entries and on saved own stations.

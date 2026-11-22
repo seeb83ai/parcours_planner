@@ -1,7 +1,7 @@
 // SVG rendering in metres: the court with all stations, and the A4 portrait print page.
-import { layout, connectors, toWorld, itemU, ITEM_TYPES, START_LEN, material, span, spotOffsets } from './model.js';
+import { layout, connectors, toWorld, itemU, ITEM_TYPES, START_LEN, material, span, spotOffsets,
+  placedItems, badges, crossings, geom, hallOf, circuit } from './model.js';
 
-export const VIEWBOX = '-1.6 -1 43.2 22';
 const COL = {
   floor: '#f3e9d6', line: '#a8977a', run: '#0f766e', throw: '#c2410c', ink: '#111827', start: '#15803d',
   cone: ['#f97316', '#9a3412'], hoop: ['none', '#7c3aed'], disc: ['#facc15', '#854d0e'], helper: ['#334155', '#0f172a'],
@@ -13,26 +13,28 @@ const COL = {
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = v => +v.toFixed(3);
 const pt = q => `${n(q.x)} ${n(q.y)}`;
+export const viewBox = p => { const { w, h } = hallOf(p); return `-1.6 -1 ${w + 3.2} ${h + 2}`; };
 
-function courtLines() {
-  const c = COL.line, x0 = Math.sqrt(81 - 8.5 ** 2);
-  return `<rect x="0" y="0" width="40" height="20" fill="${COL.floor}" stroke="${c}" stroke-width="0.1"/>
-<line x1="20" y1="0" x2="20" y2="20" stroke="${c}" stroke-width="0.08"/>
-<g fill="none" stroke="${c}" stroke-width="0.08">
-<path d="M 0 2.5 A 6 6 0 0 1 6 8.5 L 6 11.5 A 6 6 0 0 1 0 17.5"/>
-<path d="M 40 2.5 A 6 6 0 0 0 34 8.5 L 34 11.5 A 6 6 0 0 0 40 17.5"/>
-<path stroke-dasharray="0.3 0.25" d="M ${n(x0)} 0 A 9 9 0 0 1 9 8.5 L 9 11.5 A 9 9 0 0 1 ${n(x0)} 20"/>
-<path stroke-dasharray="0.3 0.25" d="M ${n(40 - x0)} 0 A 9 9 0 0 0 31 8.5 L 31 11.5 A 9 9 0 0 0 ${n(40 - x0)} 20"/></g>
-<rect x="-1" y="8.5" width="1" height="3" fill="#e5e7eb" stroke="#374151" stroke-width="0.12"/>
-<rect x="40" y="8.5" width="1" height="3" fill="#e5e7eb" stroke="#374151" stroke-width="0.12"/>`;
+// Court lines for any hall size: goal areas (6 m) and free-throw lines (9 m) around each goal,
+// clipped to the hall; the centre line only when there are two goals.
+function courtLines(p, id) {
+  const { w, h, goals } = hallOf(p), c = COL.line, y0 = h / 2;
+  const area = (r, x, dir) => `M ${x} ${n(y0 - 1.5 - r)} A ${r} ${r} 0 0 ${dir > 0 ? 1 : 0} ${x + dir * r} ${n(y0 - 1.5)} `
+    + `L ${x + dir * r} ${n(y0 + 1.5)} A ${r} ${r} 0 0 ${dir > 0 ? 1 : 0} ${x} ${n(y0 + 1.5 + r)}`;
+  const ends = goals === 'left' ? [[0, 1]] : [[0, 1], [w, -1]];
+  return `<defs><clipPath id="${id}-hall"><rect x="0" y="0" width="${w}" height="${h}"/></clipPath></defs>
+<rect x="0" y="0" width="${w}" height="${h}" fill="${COL.floor}" stroke="${c}" stroke-width="0.1"/>
+${goals === 'left' ? '' : `<line x1="${w / 2}" y1="0" x2="${w / 2}" y2="${h}" stroke="${c}" stroke-width="0.08"/>`}
+<g fill="none" stroke="${c}" stroke-width="0.08" clip-path="url(#${id}-hall)">
+${ends.map(([x, d]) => `<path d="${area(6, x, d)}"/><path stroke-dasharray="0.3 0.25" d="${area(9, x, d)}"/>`).join('\n')}</g>
+${ends.map(([x, d]) => `<rect x="${d > 0 ? -1 : w}" y="${n(y0 - 1.5)}" width="1" height="3" fill="#e5e7eb" stroke="#374151" stroke-width="0.12"/>`).join('')}`;
 }
 
 function shape(it) {
   const T = ITEM_TYPES[it.type], [fill, stroke] = COL[it.type];
   if (T.r) {
     const r = it.type === 'hoop' ? (it.size || 0.8) / 2 : T.r;
-    const ring = it.type === 'hoop';
-    return `<circle r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${ring ? 0.1 : 0.05}"/>`;
+    return `<circle r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${it.type === 'hoop' ? 0.1 : 0.05}"/>`;
   }
   const w = it.w ?? T.w, h = it.h ?? T.h;
   const across = xs => xs.map(x => `<line x1="${n(x)}" y1="${-h / 2}" x2="${n(x)}" y2="${h / 2}" stroke="${stroke}" stroke-width="0.04"/>`).join('');
@@ -62,21 +64,9 @@ function slalom(len, fr, dv) {
   return d;
 }
 
-// Every drawn copy of a station's items: { it, j (base index), k (place), q (world), rot }
-function copies(st, L) {
-  return spotOffsets(st).flatMap(({ du, dv }, k) => st.items.map((it, j) =>
-    ({ it, j, k, q: toWorld(L.frame, itemU(st, it) + du, it.v + dv), rot: L.frame.rot + (it.rot || 0) })));
-}
-
-export function badgePos(st, L) {
-  if (st.badge) return st.badge;
-  if (st.kind === 'goal') return toWorld(L.frame, st.action.u + 1.4, st.action.v - 1.4);
-  return toWorld(L.frame, span(st) / 2, 2.4 + Math.max(...spotOffsets(st).map(o => o.dv)));
-}
-
 // Axis-aligned box around a placed station (world metres).
 export function stationBox(st, L, pad = 0.8) {
-  const qs = copies(st, L).map(c => c.q);
+  const qs = placedItems(st, L).map(c => c.q);
   qs.push(L.exit);
   if (L.entry) qs.push(L.entry);
   const xs = qs.map(q => q.x), ys = qs.map(q => q.y);
@@ -95,11 +85,11 @@ const rotHandle = (q, attrs, title) => `<g ${attrs} style="cursor:grab"><title>$
 
 // Inner SVG markup of the court. opts: { id, t, edit, sel: { st, item, free } }
 export function courtInner(p, opts) {
-  const { id, t, edit, sel = {} } = opts, lay = layout(p), o = [];
+  const { id, t, edit, sel = {} } = opts, lay = layout(p), o = [], zirkel = p.mode === 'zirkel';
   const run = `<path d="M0 0L10 5L0 10z" fill="${COL.run}"/>`, thr = `<path d="M0 0L10 5L0 10z" fill="${COL.throw}"/>`;
   o.push(`<defs><marker id="${id}-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">${run}</marker>`
     + `<marker id="${id}-t" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">${thr}</marker></defs>`);
-  o.push(courtLines());
+  o.push(courtLines(p, id));
 
   // run connectors
   for (const c of connectors(p, lay)) {
@@ -129,26 +119,28 @@ export function courtInner(p, opts) {
     o.push(`<rect data-drag="station" data-st="${S}" x="${n(b.x1)}" y="${n(b.y1)}" width="${n(b.x2 - b.x1)}" height="${n(b.y2 - b.y1)}"
  rx="0.4" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="0.07" stroke-dasharray="0.3 0.2" style="cursor:move"/>`);
   }
-  // start
-  o.push(`<g ${edit ? 'data-drag="start" style="cursor:move"' : ''}><rect x="${n(p.start.x - START_LEN / 2)}" y="${n(p.start.y - 0.6)}" width="${START_LEN}" height="1.2" rx="0.3" fill="${COL.start}"/>`
+  // start (not in circuit mode: groups begin at their station)
+  if (!zirkel) o.push(`<g ${edit ? 'data-drag="start" style="cursor:move"' : ''}><rect x="${n(p.start.x - START_LEN / 2)}" y="${n(p.start.y - 0.6)}" width="${START_LEN}" height="1.2" rx="0.3" fill="${COL.start}"/>`
     + `<text x="${n(p.start.x)}" y="${n(p.start.y + 0.2)}" text-anchor="middle" font-size="0.55" font-weight="700" fill="#fff">${esc(t('start'))}</text></g>`);
   // items
   p.free.forEach((it, j) => o.push(placed(it, it, it.rot || 0, edit ? `data-drag="free" data-i="${j}" style="cursor:move"` : '', edit, sel.free === j, t)));
   p.stations.forEach((st, i) => {
     const L = lay[i];
     if (!L.fits) return;
-    for (const { it, j, k, q, rot } of copies(st, L))
+    for (const { it, j, k, q, rot } of placedItems(st, L))
       o.push(placed(it, q, rot, edit ? `data-drag="item" data-st="${i}" data-i="${j}" data-k="${k}" style="cursor:move"` : '', edit, S === i && sel.item === j, t));
     if (st.kind === 'goal')
       o.push(`<circle ${edit ? `data-drag="action" data-st="${i}" style="cursor:move"` : ''} cx="${n(L.exit.x)}" cy="${n(L.exit.y)}" r="0.35" fill="#fff" stroke="${COL.throw}" stroke-width="0.12"/>`);
   });
   // badges
-  p.stations.forEach((st, i) => {
-    if (!lay[i].fits) return;
-    const b = badgePos(st, lay[i]);
+  badges(p, lay).forEach((b, i) => {
+    if (!b) return;
     o.push(`<g ${edit ? `data-drag="badge" data-st="${i}" style="cursor:move"` : ''}><circle cx="${n(b.x)}" cy="${n(b.y)}" r="0.65" fill="${S === i ? '#0f766e' : COL.ink}"/>`
       + `<text x="${n(b.x)}" y="${n(b.y + 0.27)}" text-anchor="middle" font-size="0.75" font-weight="700" fill="#fff">${i + 1}</text></g>`);
   });
+  // unsafe crossings (editor only)
+  if (edit) for (const c of crossings(p, lay))
+    o.push(`<circle cx="${n(c.x.x)}" cy="${n(c.x.y)}" r="0.55" fill="rgba(220,38,38,0.15)" stroke="#dc2626" stroke-width="0.1"><title>${esc(t('hint.crossShort'))}</title></circle>`);
   // handles of the selected station
   if (edit && S != null) {
     const st = p.stations[S], L = lay[S];
@@ -170,8 +162,7 @@ export function courtInner(p, opts) {
       o.push(rotHandle({ x: q.x + d, y: q.y - d }, `data-drag="rotitem" data-st="${S}" data-i="${sel.item}"`, t('handle.rotate')));
     }
     if (st.kind === 'goal') {
-      const cons = connectors(p, lay).filter(c => c.type === 'curve' && c.st === S);
-      for (const c of cons) {
+      for (const c of connectors(p, lay).filter(c => c.type === 'curve' && c.st === S)) {
         o.push(`<path d="M ${pt(c.a)} L ${pt(c.c)} L ${pt(c.b)}" fill="none" stroke="#0f766e" stroke-width="0.04" stroke-dasharray="0.15 0.15"/>`);
         o.push(h(c.c, c.ctrl, t('handle.curve')));
       }
@@ -199,34 +190,56 @@ function wrap(text, size, width, measure) {
   return lines;
 }
 
-// Full A4 portrait page (mm). Returns { svg, overflow }.
+// Full A4 portrait page (mm). The station texts shrink and, if needed, go into two columns so that
+// everything fits one page. Returns { svg, overflow }.
 export function pageSVG(p, t, measure, date) {
-  const W = 210, H = 297, M = 12, CW = W - 2 * M, CH = CW * 22 / 43.2, F = 'Arial, Helvetica, sans-serif';
-  const o = [`<rect width="${W}" height="${H}" fill="#fff"/>`];
-  let y = M + 6;
-  o.push(`<text x="${M}" y="${y}" font-size="7" font-weight="700" fill="${COL.ink}">${esc(p.title || t('untitled'))}</text>`);
-  y += 6;
-  o.push(`<text x="${M}" y="${y}" font-size="3.5" fill="#4b5563">${esc([p.group, `${p.children} ${t('children')}`, date].filter(Boolean).join(' · '))}</text>`);
-  y += 4;
-  o.push(`<svg x="${M}" y="${y}" width="${CW}" height="${n(CH)}" viewBox="${VIEWBOX}">${courtInner(p, { id: 'pg', t })}</svg>`);
-  y += CH + 6;
-  const TX = M + 8, TW = CW - 8;
-  p.stations.forEach((st, i) => {
-    const lines = wrap(st.task, 3.4, TW, measure);
-    o.push(`<circle cx="${M + 2.8}" cy="${n(y + 2.3)}" r="2.8" fill="${COL.ink}"/><text x="${M + 2.8}" y="${n(y + 3.4)}" text-anchor="middle" font-size="3.2" font-weight="700" fill="#fff">${i + 1}</text>`);
-    o.push(`<text x="${TX}" y="${n(y + 3.5)}" font-size="3.9" font-weight="700" fill="${COL.ink}">${esc(st.name)}</text>`);
-    lines.forEach((l, k) => o.push(`<text x="${TX}" y="${n(y + 8.2 + k * 4.6)}" font-size="3.4" fill="#374151">${esc(l)}</text>`));
-    y += 8.2 + lines.length * 4.6 + 1;
-  });
+  const W = 210, H = 297, M = 12, CW = W - 2 * M, F = 'Arial, Helvetica, sans-serif';
+  const { w: hw, h: hh } = hallOf(p), CH = Math.min(CW * (hh + 2) / (hw + 3.2), 120), CWc = CH * (hw + 3.2) / (hh + 2);
+  const lay = layout(p), head = [`<rect width="${W}" height="${H}" fill="#fff"/>`];
+  let y0 = M + 6;
+  head.push(`<text x="${M}" y="${y0}" font-size="7" font-weight="700" fill="${COL.ink}">${esc(p.title || t('untitled'))}</text>`);
+  y0 += 6;
+  const ci = circuit(p, lay);
+  const sub = [p.group, `${p.children} ${t('children')}`,
+    p.mode === 'zirkel' && t('print.circuit', { g: ci.groups, k: ci.perGroup, m: p.rotation || 3 }), date].filter(Boolean).join(' · ');
+  head.push(`<text x="${M}" y="${y0}" font-size="3.5" fill="#4b5563">${esc(sub)}</text>`);
+  y0 += 4;
+  head.push(`<svg x="${n(M + (CW - CWc) / 2)}" y="${y0}" width="${n(CWc)}" height="${n(CH)}" viewBox="${viewBox(p)}">${courtInner(p, { id: 'pg', t })}</svg>`);
+  y0 += CH + 6;
+
   const mat = material(p).map(m => `${m.n} × ${t('item.' + m.type)}`).join(' · ');
-  if (mat) {
-    y += 2;
-    o.push(`<text x="${M}" y="${n(y + 3.5)}" font-size="3.9" font-weight="700" fill="${COL.ink}">${esc(t('material'))}</text>`);
-    wrap(mat, 3.4, CW, measure).forEach((l, k) => o.push(`<text x="${M}" y="${n(y + 8.2 + k * 4.6)}" font-size="3.4" fill="#374151">${esc(l)}</text>`));
-    y += 8.2 + wrap(mat, 3.4, CW, measure).length * 4.6;
-  }
+  const build = (s, cols) => { // s = font scale; returns { y, o }
+    const o = [], fs = 3.4 * s, fh = 3.9 * s, lh = 4.6 * s, colW = cols === 1 ? CW : (CW - 6) / 2;
+    const rows = p.stations.map((st, i) => {
+      const lines = wrap(st.task, fs, colW - 8, measure);
+      return { i, st, lines, h: 8.2 * s + lines.length * lh + 1 };
+    });
+    const total = rows.reduce((a, r) => a + r.h, 0);
+    let col = 0, y = y0, x = M, colTop = y0, maxY = y0;
+    for (const r of rows) {
+      if (cols === 2 && col === 0 && y - colTop >= total / 2 - 1e-6) { col = 1; x = M + colW + 6; maxY = Math.max(maxY, y); y = colTop; }
+      o.push(`<circle cx="${n(x + 2.8 * s)}" cy="${n(y + 2.3 * s)}" r="${n(2.8 * s)}" fill="${COL.ink}"/><text x="${n(x + 2.8 * s)}" y="${n(y + 3.4 * s)}" text-anchor="middle" font-size="${n(3.2 * s)}" font-weight="700" fill="#fff">${r.i + 1}</text>`);
+      o.push(`<text x="${n(x + 8)}" y="${n(y + 3.5 * s)}" font-size="${n(fh)}" font-weight="700" fill="${COL.ink}">${esc(r.st.name)}</text>`);
+      r.lines.forEach((l, k) => o.push(`<text x="${n(x + 8)}" y="${n(y + 8.2 * s + k * lh)}" font-size="${n(fs)}" fill="#374151">${esc(l)}</text>`));
+      y += r.h;
+    }
+    y = Math.max(y, maxY);
+    for (const [title, text] of [[t('notes'), p.notes], [t('material'), mat]]) {
+      if (!String(text || '').trim()) continue;
+      y += 2;
+      o.push(`<text x="${M}" y="${n(y + 3.5 * s)}" font-size="${n(fh)}" font-weight="700" fill="${COL.ink}">${esc(title)}</text>`);
+      const lines = wrap(text, fs, CW, measure);
+      lines.forEach((l, k) => o.push(`<text x="${M}" y="${n(y + 8.2 * s + k * lh)}" font-size="${n(fs)}" fill="#374151">${esc(l)}</text>`));
+      y += 8.2 * s + lines.length * lh;
+    }
+    return { y, o };
+  };
+  const fits = r => r.y <= H - M / 2;
+  const tries = [[1, 1], [0.9, 1], [0.8, 1], [0.9, 2], [0.8, 2], [0.7, 2], [0.62, 2]];
+  let best;
+  for (const [s, c] of tries) { best = build(s, c); if (fits(best)) break; }
   return {
-    overflow: y > H - M / 2,
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="794" height="1123" viewBox="0 0 ${W} ${H}" font-family="${F}">${o.join('\n')}</svg>`,
+    overflow: !fits(best),
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="794" height="1123" viewBox="0 0 ${W} ${H}" font-family="${F}">${head.join('\n')}\n${best.o.join('\n')}</svg>`,
   };
 }

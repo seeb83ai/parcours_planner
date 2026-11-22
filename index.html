@@ -16,12 +16,15 @@
   <input id="title" class="title-input" data-i18n-ph="untitled" aria-label="Titel">
   <nav class="tools">
     <button id="btn-new" data-i18n="tb.new"></button>
-    <select id="tpl" aria-label="Vorlage">
-    </select>
+    <select id="tpl" aria-label="Vorlage"></select>
+    <button id="btn-saved" data-i18n="tb.saved"></button>
     <label class="btn"><span data-i18n="tb.import"></span><input id="file" type="file" accept=".json,application/json" hidden></label>
     <button id="btn-export" data-i18n="tb.export"></button>
+    <button id="btn-share" data-i18n="tb.share"></button>
     <button id="btn-png" data-i18n="tb.png"></button>
     <button id="btn-print" data-i18n="tb.print"></button>
+    <button id="btn-setup" data-i18n="tb.setup"></button>
+    <button id="btn-timer" data-i18n="tb.timer" hidden></button>
     <button id="btn-undo" data-i18n-title="tb.undo">↶</button>
     <button id="btn-redo" data-i18n-title="tb.redo">↷</button>
     <button id="btn-help" class="help-btn" data-i18n-title="tb.help">?</button>
@@ -35,6 +38,10 @@
       <h2 data-i18n="side.catalog"></h2>
       <select id="filter" aria-label="Filter"></select>
       <div id="catalog"></div>
+      <div class="row-btns">
+        <button id="btn-custom-export" data-i18n="custom.export"></button>
+        <label class="btn"><span data-i18n="custom.import"></span><input id="custom-file" type="file" accept=".json,application/json" hidden></label>
+      </div>
     </section>
     <section class="card">
       <h2 data-i18n="side.palette"></h2>
@@ -44,9 +51,22 @@
     <section class="card">
       <h2 data-i18n="side.settings"></h2>
       <label><span data-i18n="f.group"></span><input id="group"></label>
-      <label><span data-i18n="f.children"></span><input id="children" type="number" min="1" max="60"></label>
-      <label><span data-i18n="f.interval"></span><input id="interval" type="number" min="1" max="60"></label>
+      <label><span data-i18n="f.children"></span><input id="children" type="number" min="1" max="99"></label>
+      <label><span data-i18n="f.hall"></span><select id="hall"></select></label>
+      <div id="hall-custom" class="two" hidden>
+        <label><span data-i18n="f.hallW"></span><input id="hall-w" type="number" min="12" max="60" step="0.5"></label>
+        <label><span data-i18n="f.hallH"></span><input id="hall-h" type="number" min="10" max="40" step="0.5"></label>
+      </div>
+      <label><span data-i18n="f.mode"></span><select id="mode"></select></label>
+      <label id="row-interval"><span data-i18n="f.interval"></span><input id="interval" type="number" min="1" max="60"></label>
+      <label id="row-rotation" hidden><span data-i18n="f.rotation"></span><input id="rotation" type="number" min="1" max="20"></label>
+      <label><span data-i18n="f.notes"></span><textarea id="notes" rows="3" data-i18n-ph="f.notesPh"></textarea></label>
     </section>
+    <details class="card">
+      <summary><h2 data-i18n="side.stock"></h2></summary>
+      <p class="muted" data-i18n="stock.hint"></p>
+      <div id="stock" class="stock"></div>
+    </details>
     <section class="card">
       <h2 data-i18n="side.hints"></h2>
       <ul id="hints" class="hints"></ul>
@@ -75,7 +95,9 @@
     <dt data-i18n="help.edit.h"></dt><dd data-i18n="help.edit"></dd>
     <dt data-i18n="help.material.h"></dt><dd data-i18n="help.material"></dd>
     <dt data-i18n="help.places.h"></dt><dd data-i18n="help.places"></dd>
+    <dt data-i18n="help.checks.h"></dt><dd data-i18n="help.checks"></dd>
     <dt data-i18n="help.texts.h"></dt><dd data-i18n="help.texts"></dd>
+    <dt data-i18n="help.circuit.h"></dt><dd data-i18n="help.circuit"></dd>
     <dt data-i18n="help.share.h"></dt><dd data-i18n="help.share"></dd>
   </dl>
   <h3 data-i18n="help.keys"></h3>
@@ -84,6 +106,9 @@
       <tr><td><kbd data-i18n="help.key.del"></kbd></td><td data-i18n="help.key.del.d"></td></tr>
       <tr><td><kbd data-i18n="help.key.r"></kbd></td><td data-i18n="help.key.r.d"></td></tr>
       <tr><td><kbd data-i18n="help.key.ctrl"></kbd></td><td data-i18n="help.key.ctrl.d"></td></tr>
+      <tr><td><kbd data-i18n="help.key.arrows"></kbd></td><td data-i18n="help.key.arrows.d"></td></tr>
+      <tr><td><kbd data-i18n="help.key.alt"></kbd></td><td data-i18n="help.key.alt.d"></td></tr>
+      <tr><td><kbd data-i18n="help.key.dup"></kbd></td><td data-i18n="help.key.dup.d"></td></tr>
       <tr><td><kbd data-i18n="help.key.undo"></kbd></td><td data-i18n="help.key.undo.d"></td></tr>
       <tr><td><kbd data-i18n="help.key.esc"></kbd></td><td data-i18n="help.key.esc.d"></td></tr>
       <tr><td><kbd data-i18n="help.key.help"></kbd></td><td data-i18n="help.key.help.d"></td></tr>
@@ -91,6 +116,34 @@
   </table>
 </dialog>
 
+<dialog id="saved" class="help" aria-labelledby="saved-title">
+  <form method="dialog"><button class="help-close" data-i18n-title="help.close">✕</button></form>
+  <h2 id="saved-title" data-i18n="saved.title"></h2>
+  <button id="btn-save-current" class="primary" data-i18n="saved.save"></button>
+  <ul id="saved-list" class="saved-list"></ul>
+</dialog>
+
+<dialog id="setup" class="help" aria-labelledby="setup-title">
+  <form method="dialog"><button class="help-close" data-i18n-title="help.close">✕</button></form>
+  <h2 id="setup-title" data-i18n="setup.title"></h2>
+  <p class="muted" data-i18n="setup.hint"></p>
+  <ul id="setup-list" class="setup-list"></ul>
+</dialog>
+
+<dialog id="timer" class="help timer" aria-labelledby="timer-title">
+  <form method="dialog"><button class="help-close" data-i18n-title="help.close">✕</button></form>
+  <h2 id="timer-title" data-i18n="timer.title"></h2>
+  <p id="timer-round" class="timer-round"></p>
+  <p id="timer-clock" class="timer-clock">0:00</p>
+  <p id="timer-next" class="muted"></p>
+  <div class="row-btns">
+    <button id="timer-start" class="primary" data-i18n="timer.start"></button>
+    <button id="timer-skip" data-i18n="timer.skip"></button>
+    <button id="timer-reset" data-i18n="timer.reset"></button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div id="print-area"></div>
 <script type="module" src="app.js"></script>
 </body>

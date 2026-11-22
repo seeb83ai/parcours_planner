@@ -24,12 +24,27 @@ The interface is in German and English.
   - by equipment: cones, hoops, bench, mat, box, helper needed, little equipment
 - **Places (Plätze):** more places repeat a station's set-up side by side or one after another. The equipment list counts every place.
 - **Length:** drag the bar at the start or end of a selected station, or use the slider. Rows of cones, hoops, hurdles, mats or cone gates keep at least their spacing: an item is added as soon as it fits and removed when it no longer does.
-- **Free editing:** drag stations, equipment and number badges. Rotate with Ctrl+drag or the ↻ handle, or by 90° with the R key. Delete with Del. You can also add extra equipment.
-- **Checks:** the app shows the time until the last child starts, stations with queue risk, and stations that no longer fit.
-- **Output:**
-  - Print on A4 portrait: the court, one description per station, and the equipment list.
+- **Hall size:** handball court 40 × 20 m, small gym 27 × 15 m, half court 20 × 20 m with one goal, or your own size. The lane, goals and court lines follow the hall.
+- **Free editing:**
+  - Drag stations, equipment and number badges. The arrow keys move the selection by 0.5 m (with Shift: 0.1 m), and Alt+drag moves it without the grid.
+  - Rotate with Ctrl+drag or the ↻ handle, or by 90° with the R key. Delete with Del.
+  - Duplicate a station with Ctrl+D or ⧉. Reorder the stations by dragging their number in the list.
+  - Add extra equipment and change its size (mats, boxes, benches, hoops).
+  - Number badges place themselves where they don't cover equipment.
+- **Formats:** a parcours, where all children run one after another, or a station circuit, where groups rotate. The circuit has a timer with a countdown and a beep at each change.
+- **Checks:**
+  - Lap time and when the last child is done.
+  - Queues at stations where a child needs longer than the start interval. Every station has an editable time per child.
+  - Throws or passes that cross a running path, marked with red circles.
+  - Missing equipment compared with the hall's stock.
+  - Stations that no longer fit.
+- **Output and sharing:**
+  - **Link teilen** (share link): the whole parcours fits into a link that you can send in a messenger. There is no server, so the link itself carries the data.
+  - Print on A4 portrait: the court, one description per station, notes and the equipment list. When there is a lot of text, it shrinks or goes into two columns, so that everything stays on one page.
   - The same page as a PNG.
+  - **Meine Parcours** (my parcours): keep several parcours in the browser.
   - Save and load the parcours as a JSON file.
+  - **Aufbau** (set-up): a checklist for the phone that shows the equipment station by station.
 - **7 ready-made parcours** ("Vorlage laden"):
   - Bewegungs-Parcours
   - Ball-Parcours
@@ -38,7 +53,7 @@ The interface is in German and English.
   - Turnhallen-Abenteuer
   - Mit wenig Material (only cones, hoops and discs)
   - Pass- und Wurf-Zirkel
-- **Your own stations:** save a changed station as your own (☆). The browser keeps your stations and the current draft.
+- **Your own stations:** save a changed station as your own (☆). Export your stations as a file and import them in another browser to share them with other coaches.
 
 ## Use it
 
@@ -53,7 +68,7 @@ Quick start:
 1. Pick a station in the list on the left. It goes onto the lane.
 2. Click a station on the court or in the list to select it. Drag to move it, drag the bar at its start or end to change its length, and use the ↻ handle to rotate it.
 3. Change the name, task text, length and places below the court.
-4. Use **PNG** or **Drucken** (print) to share the plan. **JSON speichern** saves it as a file, and **Importieren** loads one.
+4. Use **Link teilen**, **PNG** or **Drucken** (print) to share the plan. **Meine Parcours** keeps several parcours in the browser. **JSON speichern** saves the parcours as a file, and **Importieren** loads one.
 
 ### Keyboard
 
@@ -62,6 +77,9 @@ Quick start:
 | Del / Backspace | Delete the selected equipment or station |
 | R | Rotate the selection by 90° |
 | Ctrl + drag (Cmd on a Mac) | Rotate freely in 15° steps |
+| Arrow keys | Move the selection by 0.5 m (with Shift: 0.1 m) |
+| Alt + drag | Move without the 0.5 m grid |
+| Ctrl+D | Duplicate the selected station |
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Esc | Clear the selection |
 | ? | Open the help (also the **?** button at the top) |
@@ -78,7 +96,7 @@ All paths are relative, so you can serve the folder from any web server:
 | File | Content |
 |------|---------|
 | `index.html`, `style.css`, `app.js` | Editor UI, events, undo, storage, export |
-| `model.js` | Lane layout, coordinates, places, rotation, material count, import validation. It does not use the DOM. |
+| `model.js` | Hall geometry, lane layout, coordinates, places, rotation, time estimate, safety check, badge placement, material and stock check, share-link encoding, import validation. It does not use the DOM. |
 | `court.js` | SVG drawing of the court and the A4 print page |
 | `stations.js` | Station catalog |
 | `i18n.js` | German and English UI texts |

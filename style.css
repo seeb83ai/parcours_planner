@@ -87,3 +87,38 @@ input, textarea { border: 1px solid var(--line); border-radius: 8px; padding: 6p
   #print-area { display: block; }
   #print-area svg { width: 210mm; height: 297mm; display: block; }
 }
+
+/* --- v2 additions */
+.row-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.row-btns button, .row-btns .btn { font-size: 12px; padding: 4px 8px; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.side textarea { resize: vertical; }
+details.card > summary { cursor: pointer; list-style: none; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary h2 { display: inline; }
+details.card > summary::after { content: ' ▸'; color: var(--muted); }
+details.card[open] > summary::after { content: ' ▾'; }
+.stock { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-top: 8px; }
+.stock label { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 0; font-size: 12px; color: var(--ink); }
+.stock input { width: 56px; padding: 3px 6px; }
+.material li.warn { color: var(--warn); font-weight: 600; }
+.selbar .size { display: inline-flex; gap: 4px; align-items: center; color: var(--ink); }
+.selbar .size input { width: 62px; padding: 3px 6px; }
+.badge[draggable="true"] { cursor: grab; }
+.st.drop { outline: 2px dashed var(--accent); outline-offset: 2px; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--ink); color: #fff;
+  padding: 10px 16px; border-radius: 10px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 10; max-width: calc(100% - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.saved-list, .setup-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; }
+.saved-list li { display: flex; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.saved-list li > div { flex: 1; display: grid; }
+.setup-list label { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 10px; padding: 10px; cursor: pointer; }
+.setup-list input { width: 22px; height: 22px; margin: 2px 0 0; flex: none; }
+.setup-list label > span:last-child { display: grid; gap: 2px; }
+.setup-list input:checked ~ span { opacity: .45; text-decoration: line-through; }
+.timer { text-align: center; }
+.timer-round { font-weight: 600; margin: 8px 0 0; }
+.timer-clock { font: 700 72px/1.1 'Space Grotesk', Inter, sans-serif; margin: 8px 0; color: var(--accent); font-variant-numeric: tabular-nums; }
+.timer .row-btns { justify-content: center; }
+.timer .row-btns button { font-size: 15px; padding: 8px 16px; }
