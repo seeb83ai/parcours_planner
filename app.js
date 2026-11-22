@@ -67,6 +67,8 @@ function renderAll() {
   $('group').value = P.group;
   $('card-catalog').hidden = $('card-palette').hidden = !P.group;
   $('group-hint').hidden = !!P.group;
+  $('add-hint').hidden = !!P.group;
+  showTab($('layout').dataset.tab);
   $('children').value = P.children;
   $('interval').value = P.interval;
   $('rotation').value = P.rotation ?? 3;
@@ -569,6 +571,17 @@ $('stock').addEventListener('input', e => {
   store.set('parcours.stock', stock);
   renderSide();
 });
+
+// --- tabs (small screens only; on wide screens all cards show)
+function showTab(tab) {
+  $('layout').dataset.tab = tab;
+  document.querySelectorAll('.tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tab));
+}
+$('layout').addEventListener('click', e => {
+  const b = e.target.closest('.tabs [data-tab], #add-hint [data-tab]');
+  if (b) showTab(b.dataset.tab);
+});
+if (!P.group) $('layout').dataset.tab = 'setup';
 
 // --- toolbar
 $('btn-new').addEventListener('click', () => replace({ ...M.emptyParcours(), group: P.group })); // keep the Jugend

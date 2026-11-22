@@ -81,7 +81,19 @@ input, textarea { border: 1px solid var(--line); border-radius: 8px; padding: 6p
 .help form { position: absolute; top: 14px; right: 14px; margin: 0; }
 .help-close { border: 0; font-size: 16px; padding: 4px 8px; }
 @media (max-width: 560px) { .help dl { grid-template-columns: 1fr; } .help dd { margin-bottom: 6px; } }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .center { order: -1; } }
+/* small screens: one column, court on top, tabs below it show one group of cards */
+.tabs, .tab-only { display: none; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; padding: 8px; gap: 12px; }
+  .side, .center { display: contents; }
+  .court-card { order: -2; }
+  .tabs { display: flex; order: -1; gap: 4px; position: sticky; top: 0; z-index: 5; padding: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+  .tabs button { flex: 1; border: 0; padding: 8px 4px; font-weight: 600; color: var(--muted); }
+  .tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
+  .tab-only { display: block; }
+  .layout:not([data-tab="add"]) [data-pane="add"], .layout:not([data-tab="list"]) [data-pane="list"],
+  .layout:not([data-tab="setup"]) [data-pane="setup"] { display: none; }
+}
 @page { size: A4 portrait; margin: 0; }
 @media print {
   body { background: #fff; }

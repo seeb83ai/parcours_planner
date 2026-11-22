@@ -39,6 +39,7 @@ The interface is in German and English.
   - Add extra equipment and change its size (mats, boxes, benches, hoops).
   - Number badges place themselves where they don't cover equipment.
   - **Run paths:** the runs between stations have rounded corners. Click a run to edit it like a polygon: drag its corners, drag "+" to insert a corner, and double-click or press Del to delete one. "Laufweg zurücksetzen" brings back the automatic route.
+- **Phone view:** on small screens the court stays on top. Three tabs below it show one part at a time: **Hinzufügen** (station catalog and equipment), **Stationen** (the station list with texts and details) and **Gruppe & Halle** (settings, available equipment, hints and the equipment list).
 - **Formats:** a parcours, where all children run one after another, or a station circuit, where groups rotate. The circuit has a timer with a countdown and a beep at each change.
 - **Checks:**
   - Lap time and when the last child is done.
