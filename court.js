@@ -62,6 +62,22 @@ const placed = (it, q, rot, attrs, edit, sel, t) =>
 const arrow = (pts, kind, id) => `<path d="M ${pts.map(pt).join(' L ')}" fill="none" stroke="${kind === 'run' ? COL.run : COL.throw}"
  stroke-width="0.09" stroke-linecap="round" stroke-linejoin="round"${kind === 'run' ? ' stroke-dasharray="0.35 0.3"' : ''} marker-end="url(#${id}-${kind === 'run' ? 'r' : 't'})"/>`;
 
+// Polyline with rounded corners (radius up to r metres), as an SVG path.
+export function smoothD(pts, r = 1.6) {
+  if (pts.length < 3) return `M ${pts.map(pt).join(' L ')}`;
+  let d = `M ${pt(pts[0])}`;
+  for (let k = 1; k < pts.length - 1; k++) {
+    const p0 = pts[k - 1], p1 = pts[k], p2 = pts[k + 1];
+    const l1 = Math.hypot(p1.x - p0.x, p1.y - p0.y), l2 = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+    const rr = Math.min(r, l1 / 2, l2 / 2);
+    if (rr < 1e-6) { d += ` L ${pt(p1)}`; continue; }
+    const a = { x: p1.x + (p0.x - p1.x) * rr / l1, y: p1.y + (p0.y - p1.y) * rr / l1 };
+    const b = { x: p1.x + (p2.x - p1.x) * rr / l2, y: p1.y + (p2.y - p1.y) * rr / l2 };
+    d += ` L ${pt(a)} Q ${pt(p1)} ${pt(b)}`;
+  }
+  return d + ` L ${pt(pts.at(-1))}`;
+}
+
 function slalom(len, fr, dv) {
   const segs = Math.max(2, Math.round(len / 2)) * 2, step = len / segs;
   let d = `M ${pt(toWorld(fr, 0, dv))}`;
@@ -97,10 +113,13 @@ export function courtInner(p, opts) {
     + `<marker id="${id}-t" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">${thr}</marker></defs>`);
   o.push(courtLines(p, id));
 
-  // run connectors
-  for (const c of connectors(p, lay)) {
-    if (c.type === 'line') o.push(arrow(c.pts, 'run', id));
-    else o.push(`<path d="M ${pt(c.a)} Q ${pt(c.c)} ${pt(c.b)}" fill="none" stroke="${COL.run}" stroke-width="0.09" stroke-dasharray="0.35 0.3" marker-end="url(#${id}-r)"/>`);
+  // run connectors (lines with rounded corners; in the editor a wide invisible stroke makes them clickable)
+  const cons = connectors(p, lay);
+  for (const c of cons) {
+    if (c.type === 'line') {
+      o.push(`<path d="${smoothD(c.pts)}" fill="none" stroke="${COL.run}" stroke-width="${sel.route === c.to ? 0.16 : 0.09}" stroke-linecap="round" stroke-dasharray="0.35 0.3" marker-end="url(#${id}-r)"/>`);
+      if (edit) o.push(`<path data-drag="route" data-r="${c.to}" d="${smoothD(c.pts)}" fill="none" stroke="transparent" stroke-width="0.8" style="cursor:pointer"><title>${esc(t('handle.route'))}</title></path>`);
+    } else o.push(`<path d="M ${pt(c.a)} Q ${pt(c.c)} ${pt(c.b)}" fill="none" stroke="${COL.run}" stroke-width="0.09" stroke-dasharray="0.35 0.3" marker-end="url(#${id}-r)"/>`);
   }
   // station paths and pass/throw arrows
   p.stations.forEach((st, i) => {
@@ -173,6 +192,19 @@ export function courtInner(p, opts) {
         o.push(h(c.c, c.ctrl, t('handle.curve')));
       }
     }
+  }
+  // corners of the selected run line: drag a corner, drag "+" to add one
+  const rc = edit && sel.route != null && cons.find(c => c.type === 'line' && c.to === sel.route);
+  if (rc) {
+    const P = rc.pts;
+    for (let k = 0; k + 1 < P.length; k++) {
+      const m = { x: (P[k].x + P[k + 1].x) / 2, y: (P[k].y + P[k + 1].y) / 2 };
+      o.push(`<g data-drag="viamid" data-r="${sel.route}" data-i="${k}" style="cursor:copy"><title>${esc(t('handle.viaAdd'))}</title>`
+        + `<circle cx="${n(m.x)}" cy="${n(m.y)}" r="0.28" fill="#d5ebe4" stroke="#0f766e" stroke-width="0.06"/>`
+        + `<text x="${n(m.x)}" y="${n(m.y + 0.15)}" text-anchor="middle" font-size="0.45" font-weight="700" fill="#0f766e">+</text></g>`);
+    }
+    P.slice(1, -1).forEach((q, k) => o.push(`<circle data-drag="via" data-r="${sel.route}" data-i="${k}" cx="${n(q.x)}" cy="${n(q.y)}" r="0.38"`
+      + ` fill="${sel.vi === k ? '#0f766e' : '#fff'}" stroke="#0f766e" stroke-width="0.1" style="cursor:grab"><title>${esc(t('handle.via'))}</title></circle>`));
   }
   const fi = edit && p.free[sel.free];
   if (fi) {

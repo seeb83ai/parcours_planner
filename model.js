@@ -167,7 +167,9 @@ export function laneRoute(a, b, G = geom()) {
 }
 
 // Run connectors between start, stations and finish (none in circuit mode, groups stay at their station).
-// { type: 'line', pts } or { type: 'curve', a, c, b, st, ctrl } (quadratic bezier; ctrl = 'approach'|'exitCtrl').
+// { type: 'line', pts, to } or { type: 'curve', a, c, b, st, ctrl } (quadratic bezier; ctrl = 'approach'|'exitCtrl').
+// A line runs along the lane, unless the coach drew its corners: `via` on the station it leads to
+// (to = station index), `finishVia` on the parcours for the last run (to = -1).
 export function connectors(p, lay) {
   if (p.mode === 'zirkel') return [];
   const G = geom(hallOf(p)), out = [];
@@ -184,12 +186,22 @@ export function connectors(p, lay) {
       const a = prev.pt, b = L.exit;
       out.push({ type: 'curve', a, c: approachCtrl(st, L, a), b, st: i, ctrl: 'approach' });
     } else if (prev.st?.kind === 'goal') out.push(curveFrom(prev, L.entry));
-    else out.push({ type: 'line', pts: laneRoute(prev.pt, L.entry, G) });
+    else out.push({ type: 'line', to: i, pts: st.via ? [prev.pt, ...st.via, L.entry] : laneRoute(prev.pt, L.entry, G) });
     prev = { pt: L.exit, st, L, i };
   });
   const fin = finishPoint(p);
-  out.push(prev.st?.kind === 'goal' ? curveFrom(prev, fin) : { type: 'line', pts: laneRoute(prev.pt, fin, G) });
+  out.push(prev.st?.kind === 'goal' ? curveFrom(prev, fin)
+    : { type: 'line', to: -1, pts: p.finishVia ? [prev.pt, ...p.finishVia, fin] : laneRoute(prev.pt, fin, G) });
   return out;
+}
+
+// Corners of a run line (without its end points), and setting them (undefined = automatic lane route).
+export function viaOf(p, lay, to) {
+  const c = connectors(p, lay).find(x => x.type === 'line' && x.to === to);
+  return c ? c.pts.slice(1, -1).map(q => ({ x: r3(q.x), y: r3(q.y) })) : [];
+}
+export function setVia(p, to, via) {
+  if (to === -1) p.finishVia = via; else p.stations[to].via = via;
 }
 
 // Default approach: bend through the corner (action.u, entry.v) in goal coordinates.
@@ -324,6 +336,7 @@ export function rotateStation(st, stO, L, c, th) {
 export function duplicateStation(p, i) {
   const orig = p.stations[i], c = structuredClone(orig);
   c.badge = null;
+  delete c.via; // the copy gets its own automatic run
   let delta = 0;
   if (c.kind === 'lane' && orig.pin) {
     const base = layout({ ...p, stations: p.stations.map((s, k) => (k === i ? { ...s, pin: null } : s)) })[i];
@@ -370,7 +383,8 @@ export const emptyParcours = () => ({
 });
 
 // Trust boundary for imported files and shared links.
-const okStation = s => s && Array.isArray(s.items)
+const okVia = v => v == null || (Array.isArray(v) && v.length <= 50 && v.every(q => Number.isFinite(q?.x) && Number.isFinite(q?.y)));
+const okStation = s => s && Array.isArray(s.items) && okVia(s.via)
   && ((s.kind === 'lane' && Number.isFinite(s.length)) || (s.kind === 'goal' && Number.isFinite(s.action?.u)))
   && s.items.every(it => it && ITEM_TYPES[it.type]);
 export function validate(p) {
@@ -378,7 +392,7 @@ export function validate(p) {
   const ok = p && p.schemaVersion === 2 && Array.isArray(p.stations) && Array.isArray(p.free)
     && Number.isFinite(p.start?.x) && Number.isFinite(p.start?.y)
     && (!h || (Number.isFinite(h.w) && Number.isFinite(h.h) && h.w >= 12 && h.w <= 60 && h.h >= 10 && h.h <= 40))
-    && p.stations.every(okStation) && p.free.every(it => it && ITEM_TYPES[it.type]);
+    && p.stations.every(okStation) && okVia(p.finishVia) && p.free.every(it => it && ITEM_TYPES[it.type]);
   if (!ok) throw new Error('invalid');
   return p;
 }

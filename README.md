@@ -31,6 +31,7 @@ The interface is in German and English.
   - Duplicate a station with Ctrl+D or ⧉. The copy goes to the end of the track, with the same size and rotation. Reorder the stations by dragging their number in the list.
   - Add extra equipment and change its size (mats, boxes, benches, hoops).
   - Number badges place themselves where they don't cover equipment.
+  - **Run paths:** the runs between stations have rounded corners. Click a run to edit it like a polygon: drag its corners, drag "+" to insert a corner, and double-click or press Del to delete one. "Laufweg zurücksetzen" brings back the automatic route.
 - **Formats:** a parcours, where all children run one after another, or a station circuit, where groups rotate. The circuit has a timer with a countdown and a beep at each change.
 - **Checks:**
   - Lap time and when the last child is done.

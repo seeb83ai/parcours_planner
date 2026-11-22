@@ -179,6 +179,20 @@ check('copy keeps a 90° rotation relative to its lane', rc.pin && M.norm(rc.pin
 const full = P(Array.from({ length: 6 }, () => st('slalom-prellen', { length: 14 })));
 check('no room left: copy is refused', M.duplicateStation(full, 0) === null);
 
+// editable runs: corners replace the automatic lane route, reset brings it back
+const vp = P([st('slalom-prellen'), st('slalom-prellen'), st('slalom-prellen')]); // 3rd jumps the corner
+let vl = M.layout(vp);
+const auto = M.viaOf(vp, vl, 2);
+check('automatic run has the lane corner', auto.length === 1 && near(auto[0], { x: 40 - I, y: I }));
+M.setVia(vp, 2, [{ x: 36, y: 4 }, { x: 37, y: 5 }]);
+let vc = M.connectors(vp, M.layout(vp)).find(c => c.to === 2);
+check('drawn corners are used', vc.pts.length === 4 && near(vc.pts[1], { x: 36, y: 4 }));
+M.setVia(vp, -1, []);
+check('finish run can be a straight line', M.connectors(vp, M.layout(vp)).at(-1).pts.length === 2);
+M.setVia(vp, 2, undefined);
+check('reset gives the lane route again', M.viaOf(vp, M.layout(vp), 2).length === 1);
+check('import rejects broken corners', (() => { try { M.validate({ ...vp, finishVia: [{ x: 'a' }] }); } catch { return true; } })());
+
 // validation at the import boundary
 const bad = x => { try { M.validate(x); return false; } catch { return true; } };
 check('validate rejects schema 1', bad({ schemaVersion: 1, stations: [] }));

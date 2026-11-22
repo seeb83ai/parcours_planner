@@ -132,6 +132,11 @@ function renderSelbar() {
   const hint = `<span>${esc(t('sel.keys'))}</span>`;
   const st = P.stations[sel.st], item = sel.free != null ? P.free[sel.free] : st?.items[sel.item];
   let h;
+  if (sel.route != null) {
+    h = `<strong>${esc(t('sel.route'))}</strong> ${sel.vi != null ? b('viadel', 'sel.viaDel') : ''} ${b('viareset', 'sel.viaReset')} <span>${esc(t('sel.routeKeys'))}</span>`;
+    $('selbar').innerHTML = h;
+    return;
+  }
   if (sel.free != null && item) h = `${esc(t('sel.item'))}: ${esc(t('item.' + item.type))} ${sizeInputs(item)} ${b('rotate', 'sel.rotate')} ${b('delete', 'sel.delete')} ${hint}`;
   else if (st) {
     h = `<strong>${sel.st + 1} ${esc(st.name)}</strong>`;
@@ -219,7 +224,21 @@ function moveStation(from, to) {
   });
 }
 
+function deleteCorner(to, k) {
+  change(() => {
+    const v = M.viaOf(P, M.layout(P), to);
+    v.splice(k, 1);
+    M.setVia(P, to, v);
+    sel = { route: to };
+  });
+}
+
 function selAction(act) {
+  if (sel.route != null) {
+    if (act === 'viareset') change(() => { M.setVia(P, sel.route, undefined); sel = { route: sel.route }; });
+    if ((act === 'viadel' || act === 'delete') && sel.vi != null) deleteCorner(sel.route, sel.vi);
+    return;
+  }
   const st = P.stations[sel.st];
   const item = sel.free != null ? P.free[sel.free] : st?.items[sel.item];
   if (!item && !st) return;
@@ -330,6 +349,13 @@ function applyMove(d, q, dx, dy, exact) {
     }
     sel.item = undefined;
   }
+  if (kind === 'via' || kind === 'viamid') {
+    // the first move turns the automatic route into editable corners; "+" inserts a new corner
+    const v = M.viaOf(O, lay, d.r), c = { x: r3(sn(q.x)), y: r3(sn(q.y)) };
+    if (kind === 'viamid') v.splice(d.i, 0, c); else v[d.i] = c;
+    M.setVia(P, d.r, v);
+    sel = { route: d.r, vi: d.i };
+  }
   if (kind === 'action') st.action = local(q.x, q.y);
   if (kind === 'approach' || kind === 'exitCtrl') st[kind] = local(q.x, q.y);
   if (kind.startsWith('rot')) {
@@ -354,7 +380,7 @@ function nudge(dx, dy) {
 
 // --- court dragging
 const svg = $('court');
-let drag = null;
+let drag = null, lastDown = {};
 const svgPt = e => { const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return { x: q.x, y: q.y }; };
 
 svg.addEventListener('pointerdown', e => {
@@ -362,7 +388,12 @@ svg.addEventListener('pointerdown', e => {
   if (!el) { sel = {}; renderCourt(); markList(); return; }
   let kind = el.dataset.drag;
   const st = el.dataset.st != null ? +el.dataset.st : null, i = el.dataset.i != null ? +el.dataset.i : null;
-  if (kind === 'free' || kind === 'rotfree') sel = { free: i };
+  // double-click on a corner deletes it (detected here: pointer capture sends dblclick to the svg)
+  const key = `${kind}:${el.dataset.r}:${i}`, now = Date.now();
+  if (kind === 'via' && lastDown.key === key && now - lastDown.at < 400) { lastDown = {}; return deleteCorner(+el.dataset.r, i); }
+  lastDown = { key, at: now };
+  if (kind === 'route' || kind === 'via' || kind === 'viamid') sel = { route: +el.dataset.r, vi: kind === 'via' ? i : undefined };
+  else if (kind === 'free' || kind === 'rotfree') sel = { free: i };
   else if (kind === 'item' || kind === 'rotitem') sel = { st, item: i };
   else if (kind === 'start') sel = {};
   else if (kind === 'station' || kind === 'badge' || sel.st !== st) sel = { st };
@@ -373,7 +404,7 @@ svg.addEventListener('pointerdown', e => {
   if (kind === 'rotst') { const b = stationBox(O.stations[st], lay[st]); c = { x: (b.x1 + b.x2) / 2, y: (b.y1 + b.y2) / 2 }; }
   if (kind === 'rotitem') c = itemPlace(O.stations[st].items[i], O.stations[st], lay[st]);
   if (kind === 'rotfree') c = O.free[i];
-  drag = { kind, st, i, k: +(el.dataset.k || 0), c, p0: svgPt(e), O, lay, moved: false };
+  drag = { kind, st, i, r: +el.dataset.r, k: +(el.dataset.k || 0), c, p0: svgPt(e), O, lay, moved: false };
   svg.setPointerCapture(e.pointerId);
   renderCourt();
   markList();
@@ -396,6 +427,7 @@ const endDrag = () => {
   if (moved) renderAll();
 };
 svg.addEventListener('pointerup', endDrag);
+
 svg.addEventListener('pointercancel', endDrag);
 
 // --- catalog, palette, selection bar
