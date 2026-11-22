@@ -17,6 +17,7 @@ button:hover, .btn:hover { border-color: var(--accent); }
 button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, .btn:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
 input, textarea { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; width: 100%; background: #fff; }
 .muted { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+.hint-pick { margin: -2px 0 10px; padding: 6px 8px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-size: 12px; }
 
 .bar { display: flex; gap: 12px; align-items: center; padding: 10px 16px; background: #fff; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 .title-input { max-width: 320px; font-weight: 600; }

@@ -407,8 +407,17 @@ export function newStation(entry, lang) {
   return st;
 }
 
+// Age groups (Jugend), youngest first. `group` holds one of these keys, '' = not chosen yet.
+export const AGES = ['superminis', 'minis', 'F', 'E', 'D', 'C', 'B', 'A'];
+// Older files have free text ("F-Jugend", "Minis"): map it to a key, anything else to ''.
+export const ageKey = g => {
+  if (AGES.includes(g)) return g;
+  const s = String(g ?? '');
+  return /super/i.test(s) ? 'superminis' : /mini/i.test(s) ? 'minis' : /^\s*([a-f])[\s-]*(jugend|youth)/i.exec(s)?.[1].toUpperCase() ?? '';
+};
+
 export const emptyParcours = () => ({
-  schemaVersion: 2, title: '', group: 'F-Jugend', children: 20, interval: 5,
+  schemaVersion: 2, title: '', group: '', children: 20, interval: 5,
   hall: HALLS.full, mode: 'parcours', rotation: 3, notes: '',
   start: startPoint(HALLS.full), free: [], stations: [],
 });
@@ -426,6 +435,7 @@ export function validate(p) {
     && (!h || (Number.isFinite(h.w) && Number.isFinite(h.h) && h.w >= 12 && h.w <= 60 && h.h >= 10 && h.h <= 40))
     && p.stations.every(okStation) && okVia(p.finishVia) && p.free.every(it => it && ITEM_TYPES[it.type]);
   if (!ok) throw new Error('invalid');
+  p.group = ageKey(p.group);
   return p;
 }
 export function validateStations(list) {

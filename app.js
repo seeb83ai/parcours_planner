@@ -1,5 +1,5 @@
 import { t, setLang, getLang } from './i18n.js';
-import { CATALOG, FILTERS } from './stations.js';
+import { CATALOG, FILTERS, forAge } from './stations.js';
 import { PRESETS, buildPreset } from './presets.js';
 import * as M from './model.js';
 import { courtInner, pageSVG, esc, stationBox, itemPlace, viewBox } from './court.js';
@@ -63,7 +63,10 @@ function renderCourt({ selbar = true } = {}) {
 function renderAll() {
   const hall = M.hallOf(P), zirkel = P.mode === 'zirkel';
   $('title').value = P.title;
+  $('group').innerHTML = `<option value="">${esc(t('age.none'))}</option>` + M.AGES.map(k => `<option value="${k}">${esc(t('age.' + k))}</option>`).join('');
   $('group').value = P.group;
+  $('card-catalog').hidden = $('card-palette').hidden = !P.group;
+  $('group-hint').hidden = !!P.group;
   $('children').value = P.children;
   $('interval').value = P.interval;
   $('rotation').value = P.rotation ?? 3;
@@ -83,7 +86,7 @@ function renderAll() {
     + FILTERS.filter(x => x.group === g).map(x => `<option value="${x.id}">${esc(t('filter.' + x.id))}</option>`).join('') + '</optgroup>').join('');
   $('filter').value = fv;
   $('tpl').innerHTML = `<option value="">${esc(t('tb.template'))}</option>`
-    + PRESETS.map(d => `<option value="${d.id}">${esc(d.title[getLang()] ?? d.title.de)}</option>`).join('');
+    + PRESETS.filter(d => forAge(d, P.group)).map(d => `<option value="${d.id}">${esc(d.title[getLang()] ?? d.title.de)}</option>`).join('');
   if (!$('stock').contains(document.activeElement))
     $('stock').innerHTML = Object.keys(M.ITEM_TYPES).map(k => `<label><span>${esc(t('item.' + k))}</span>`
       + `<input type="number" min="0" max="99" data-stock="${k}" value="${stock[k] ?? ''}" placeholder="–"></label>`).join('');
@@ -158,7 +161,7 @@ function renderCatalog() {
   if (mine.length) h += `<div class="cat-group">${esc(t('side.custom'))}</div>`
     + mine.map(([e, k]) => row(e, `data-custom="${k}"`, `<button data-delcustom="${k}" title="${esc(t('custom.delete'))}" aria-label="${esc(t('custom.delete'))}">✕</button>`)).join('');
   const groups = {};
-  for (const e of CATALOG.filter(flt.f)) (groups[e.kind === 'goal' ? 'goal' : e.skill] ??= []).push(e);
+  for (const e of CATALOG.filter(e => flt.f(e) && forAge(e, P.group))) (groups[e.kind === 'goal' ? 'goal' : e.skill] ??= []).push(e);
   for (const [g, list] of Object.entries(groups))
     h += `<div class="cat-group">${esc(t('skill.' + g))}</div>` + list.map(e => row(e, `data-ref="${e.ref}"`)).join('');
   $('catalog').innerHTML = h;
@@ -534,7 +537,8 @@ list.addEventListener('drop', e => {
 list.addEventListener('dragend', () => { dragFrom = null; list.querySelectorAll('.drop').forEach(x => x.classList.remove('drop')); });
 
 // --- group, hall, mode, notes, stock
-for (const id of ['title', 'group', 'children', 'interval', 'rotation', 'notes']) {
+$('group').addEventListener('change', e => change(() => { P.group = e.target.value; }));
+for (const id of ['title', 'children', 'interval', 'rotation', 'notes']) {
   $(id).addEventListener('focus', begin);
   $(id).addEventListener('input', e => {
     commit();
@@ -563,13 +567,15 @@ $('stock').addEventListener('input', e => {
 });
 
 // --- toolbar
-$('btn-new').addEventListener('click', () => replace(M.emptyParcours()));
+$('btn-new').addEventListener('click', () => replace({ ...M.emptyParcours(), group: P.group })); // keep the Jugend
 $('tpl').addEventListener('change', e => {
   const def = PRESETS.find(d => d.id === e.target.value);
   e.target.value = '';
   if (!def) return;
-  const next = buildPreset(def, getLang()); // keep the hall and the format that are set
-  Object.assign(next, { hall: M.hallOf(P), start: M.startPoint(M.hallOf(P)), mode: P.mode ?? 'parcours', rotation: P.rotation ?? 3 });
+  const next = buildPreset(def, getLang()); // keep the hall, the Jugend (if it fits) and the format (unless the template sets one)
+  Object.assign(next, { hall: M.hallOf(P), start: M.startPoint(M.hallOf(P)) });
+  if (P.group && forAge(def, P.group)) next.group = P.group;
+  if (!def.mode) Object.assign(next, { mode: P.mode ?? 'parcours', rotation: P.rotation ?? 3 });
   replace(next);
 });
 $('file').addEventListener('change', async e => {

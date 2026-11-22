@@ -1,6 +1,6 @@
 # Parcours-Planer
 
-A web app for handball coaches to plan a gym parcours (obstacle course) for young children, made for the F-Jugend (under 9). You build the parcours step by step: each station is placed clockwise around the hall. You can then print it on A4 or share it as an image.
+A web app for handball coaches to plan a gym parcours (obstacle course) or a station circuit for youth teams, from the Super-Minis (age 3–5) to the A-Jugend (under 19). It was made first for the F-Jugend (under 9). You build the parcours step by step: each station is placed clockwise around the hall. You can then print it on A4 or share it as an image.
 
 The interface is in German and English.
 
@@ -17,10 +17,15 @@ The interface is in German and English.
 
 - **Step-by-step building:** pick a station from the catalog. It goes on a lane 2.5 m inside the walls, after the selected station.
 - **Goal stations:** at most one in front of each goal. They have a throw spot and a run path that you can bend.
-- **Catalog with 60 stations:** dribbling, ball feeling, passing, throwing, defence and movement. The stations follow common F-Jugend exercises, for example from the BWHV/HVW Kinderhandball catalog.
+- **Age groups (Jugend):** choose Super-Minis, Minis or F- to A-Jugend under "Gruppe & Halle". The catalog and the templates then show only what suits this age group. The station catalog and the equipment palette appear after you choose an age group.
+- **Catalog with 76 stations:** dribbling, ball feeling, passing, throwing, defence, movement and athletics. Examples:
+  - Super-Minis and Minis: animal walks, balloon, rolling the ball into the goal.
+  - E- and D-Jugend: body feints, dribbling two balls, defence square, three-step shot, fast break.
+  - C- to A-Jugend: planks, box jumps, medicine ball, shuttle sprint, Kempa trick.
+  The stations follow common youth handball exercises, for example from the BWHV/HVW Kinderhandball catalog.
 - **Filter:** narrow the catalog with a dropdown:
   - by ball: with ball, without ball
-  - by activity: dribbling, passing, throwing, ball feeling, defence, jumping, crawling and rolling, climbing, balance, goal stations
+  - by activity: dribbling, passing, throwing, ball feeling, defence, jumping, crawling and rolling, climbing, balance, athletics, goal stations
   - by equipment: cones, hoops, bench, mat, box, helper needed, little equipment
 - **Easier / harder:** each station has three task texts (Leichter / Normal / Schwerer). The switch next to the task text only changes the text; the set-up stays the same. If you changed the text by hand, the app asks before replacing it.
 - **Places (Plätze):** more places repeat a station's set-up side by side or one after another. The equipment list counts every place.
@@ -47,7 +52,7 @@ The interface is in German and English.
   - **Meine Parcours** (my parcours): keep several parcours in the browser.
   - Save and load the parcours as a JSON file.
   - **Aufbau** (set-up): a checklist for the phone that shows the equipment station by station.
-- **7 ready-made parcours** ("Vorlage laden"):
+- **10 ready-made parcours** ("Vorlage laden"). The list shows only the templates for the chosen age group:
   - Bewegungs-Parcours
   - Ball-Parcours
   - Koordinations-Parcours
@@ -55,6 +60,9 @@ The interface is in German and English.
   - Turnhallen-Abenteuer
   - Mit wenig Material (only cones, hoops and discs)
   - Pass- und Wurf-Zirkel
+  - Bewegungslandschaft Super-Minis
+  - Technik-Parcours E/D-Jugend
+  - Athletik-Zirkel C–A-Jugend (station circuit)
 - **Your own stations:** save a changed station as your own (☆). Export your stations as a file and import them in another browser to share them with other coaches.
 
 ## Use it
@@ -67,10 +75,11 @@ python3 -m http.server 8000
 ```
 
 Quick start:
-1. Pick a station in the list on the left. It goes onto the lane.
-2. Click a station on the court or in the list to select it. Drag to move it, drag the bar at its start or end to change its length, and use the ↻ handle to rotate it.
-3. Change the name, task text, length and places below the court.
-4. Use **Link teilen**, **PNG** or **Drucken** (print) to share the plan. **Meine Parcours** keeps several parcours in the browser. **JSON speichern** saves the parcours as a file, and **Importieren** loads one.
+1. Choose the age group (Jugend) under "Gruppe & Halle".
+2. Pick a station in the list on the left. It goes onto the lane.
+3. Click a station on the court or in the list to select it. Drag to move it, drag the bar at its start or end to change its length, and use the ↻ handle to rotate it.
+4. Change the name, task text, length and places below the court.
+5. Use **Link teilen**, **PNG** or **Drucken** (print) to share the plan. **Meine Parcours** keeps several parcours in the browser. **JSON speichern** saves the parcours as a file, and **Importieren** loads one.
 
 ### Keyboard
 
@@ -115,7 +124,7 @@ node test.js        # or open test.html in the browser
 
 ### Add a preset
 
-Add an entry to `PRESETS` in `presets.js`. It lists catalog stations in clockwise order, with an optional `length` and `capacity` for each station. The app builds the preset from the current catalog, in the chosen language. `node test.js` checks that every station of every preset fits on the lane.
+Add an entry to `PRESETS` in `presets.js`. `ages` (for example `'E-D'`) sets the age groups that see the template. It lists catalog stations in clockwise order, with an optional `length` and `capacity` for each station. The app builds the preset from the current catalog, in the chosen language. `node test.js` checks that every station of every preset fits on the lane.
 
 ### Add a station
 
@@ -132,6 +141,7 @@ Other fields:
 | `spots` | `'across'` (default): extra places go side by side. `'along'`: extra places go one after another. |
 | `spotStep` | Distance between places side by side, in metres (default 2) |
 | `flow: true` | Children follow each other without waiting, so the app shows no queue warning |
+| `AGE` | Map at the end of `stations.js`. Every station needs an age range, for example `'F-C'`. `node test.js` checks this. |
 | `TAGS` | List at the end of `stations.js`. Add the station there if it belongs to `springen`, `kriechen` or another filter that the app cannot derive from the skill or the equipment. |
 
 Write the texts as `{ de, en }`.

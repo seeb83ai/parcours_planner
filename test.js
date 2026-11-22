@@ -1,6 +1,6 @@
 // Layout logic checks. Run: `node test.js`, or open test.html in the browser.
 import * as M from './model.js';
-import { CATALOG, FILTERS } from './stations.js';
+import { CATALOG, FILTERS, forAge } from './stations.js';
 import { PRESETS, buildPreset } from './presets.js';
 
 const results = [];
@@ -204,6 +204,17 @@ check('station off the lane: straight run, no detour', M.connectors(off, M.layou
 check('import rejects broken corners', (() => { try { M.validate({ ...vp, finishVia: [{ x: 'a' }] }); } catch { return true; } })());
 
 // easier / harder texts: every catalog station except the free goal station has both, base texts stay clean
+// age groups
+check('every station has a valid age range', CATALOG.every(c => c.ages && M.AGES.indexOf(c.ages[0]) >= 0 && M.AGES.indexOf(c.ages[0]) <= M.AGES.indexOf(c.ages[1])));
+for (const g of M.AGES) {
+  const list = CATALOG.filter(c => forAge(c, g));
+  check(`${g}: >= 20 stations, >= 2 goal stations, a template`, list.length >= 20 && list.filter(c => c.kind === 'goal').length >= 2 && PRESETS.some(d => forAge(d, g)));
+}
+check('no age group = all stations', CATALOG.every(c => forAge(c, '')));
+check('old group text is mapped', M.ageKey('F-Jugend') === 'F' && M.ageKey('Super-Minis') === 'superminis' && M.ageKey('Minis') === 'minis'
+  && M.ageKey('a-jugend') === 'A' && M.ageKey('Anfänger') === '' && M.ageKey(undefined) === '');
+check('import maps the group', M.validate({ ...M.emptyParcours(), group: 'E-Jugend' }).group === 'E');
+check('template sets its age group and format', (p => p.group === 'C' && p.mode === 'zirkel')(buildPreset(PRESETS.find(d => d.id === 'athletik'), 'de')));
 check('variants for all stations', CATALOG.filter(c => c.ref !== 'torstation').every(c => c.easy?.de && c.hard?.de && c.easy?.en && c.hard?.en));
 check('no "Schwerer:" left in the normal texts', CATALOG.every(c => !/Schwerer:|Harder:/.test(c.task.de + c.task.en)));
 const lv = st('slalom-prellen');

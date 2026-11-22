@@ -1,6 +1,6 @@
 # Parcours-Planer – Plan
 
-Static website (no build step, no backend) to build a handball parcours for F-Jugend step by step.
+Static website (no build step, no backend) to build a handball parcours step by step, from Super-Minis to A-Jugend (made first for the F-Jugend).
 Reference material: `drafts/` (handover with learnings, old scripts, design draft).
 
 ## Decisions (grill session 2026-11-22)
@@ -23,6 +23,7 @@ Reference material: `drafts/` (handover with learnings, old scripts, design draf
 | 14 | v2 editor | Hall size (`hall` in the data: presets full/small/half or own size; lane, goals and lines follow). Arrow-key nudging, Alt-drag without grid, badges avoid equipment, print auto-fit (smaller text / 2 columns), hand-adjusted rows only stretch (`manual`), item size editing, duplicate (Ctrl+D), drag-reorder, notes on the print, share link (deflate + base64url in `#p=`), "Meine Parcours" in localStorage, stock check, crossing check, time estimate (`secs` per station, 3 m/s running, 1.2 m/s in walk-through stations), set-up checklist, circuit mode (`mode: 'zirkel'`, `rotation` min) with timer, export/import of own stations. |
 | 15 | Run paths | Runs between stations are drawn with rounded corners. A run can be edited as a polygon: its corners are stored on the station it leads to (`via`), the last run in `finishVia`; no value = automatic lane route. Curves to and from goal stations keep their single bezier handle. |
 | 16 | Difficulty | Catalog stations carry `easy`/`hard` texts (VARIANTS in `stations.js`); a placed station keeps `variants` {easy, normal, hard} and `level`. The switch only swaps `task`; it asks first when the text no longer matches the current variant. New item `sprossenwand` for wall-bar stations (pin them where the hall has wall bars). |
+| 17 | Age groups | `group` is an age-group key (`AGES` in `model.js`: superminis, minis, F, E, D, C, B, A; '' = not chosen). Older files with free text are mapped by `ageKey` on import ("F-Jugend" → F, else ''). Each catalog station has `ages` [from, to] (AGE map in `stations.js`); the catalog and the template list show only what fits the chosen group. Catalog and equipment cards stay hidden until a group is chosen. New skill `athletics` (C–A). "Neu" keeps the group; a template keeps it when it fits, else sets its own. |
 | 11 | Misc | Undo/redo (50). GitHub Pages now, nginx on a Raspberry Pi later (all paths relative). i18n DE/EN (`i18n.js`). Modern browsers only. `test.html` for layout logic. |
 
 ## Coordinates
@@ -45,7 +46,7 @@ Goal stations use goal-local coordinates: origin = goal centre, `u` into the cou
 {
   "schemaVersion": 2,
   "title": "Ball-Parcours F-Jugend",
-  "group": "F-Jugend", "children": 22, "interval": 5,
+  "group": "F", "children": 22, "interval": 5,
   "start": { "x": 4.5, "y": 2.5 },
   "free": [ { "type": "ballbox", "x": 3.5, "y": 3, "rot": 0 } ],
   "stations": [

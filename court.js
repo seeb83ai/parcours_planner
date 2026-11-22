@@ -238,7 +238,7 @@ export function pageSVG(p, t, measure, date) {
   head.push(`<text x="${M}" y="${y0}" font-size="7" font-weight="700" fill="${COL.ink}">${esc(p.title || t('untitled'))}</text>`);
   y0 += 6;
   const ci = circuit(p, lay);
-  const sub = [p.group, `${p.children} ${t('children')}`,
+  const sub = [p.group && t('age.' + p.group), `${p.children} ${t('children')}`,
     p.mode === 'zirkel' && t('print.circuit', { g: ci.groups, k: ci.perGroup, m: p.rotation || 3 }), date].filter(Boolean).join(' · ');
   head.push(`<text x="${M}" y="${y0}" font-size="3.5" fill="#4b5563">${esc(sub)}</text>`);
   y0 += 4;

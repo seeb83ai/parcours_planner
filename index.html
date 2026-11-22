@@ -34,7 +34,7 @@
 
 <main class="layout">
   <aside class="side">
-    <section class="card">
+    <section class="card" id="card-catalog">
       <h2 data-i18n="side.catalog"></h2>
       <select id="filter" aria-label="Filter"></select>
       <div id="catalog"></div>
@@ -43,14 +43,15 @@
         <label class="btn"><span data-i18n="custom.import"></span><input id="custom-file" type="file" accept=".json,application/json" hidden></label>
       </div>
     </section>
-    <section class="card">
+    <section class="card" id="card-palette">
       <h2 data-i18n="side.palette"></h2>
       <div id="palette" class="palette"></div>
       <p id="palette-hint" class="muted"></p>
     </section>
     <section class="card">
       <h2 data-i18n="side.settings"></h2>
-      <label><span data-i18n="f.group"></span><input id="group"></label>
+      <label><span data-i18n="f.group"></span><select id="group"></select></label>
+      <p id="group-hint" class="hint-pick" data-i18n="f.groupHint"></p>
       <label><span data-i18n="f.children"></span><input id="children" type="number" min="1" max="99"></label>
       <label><span data-i18n="f.hall"></span><select id="hall"></select></label>
       <div id="hall-custom" class="two" hidden>

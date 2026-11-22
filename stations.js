@@ -8,6 +8,8 @@
 // v = across (positive = the side the lane comes from). Plätze is only a number there.
 const spread = (type, n, v = 0, extra = {}) =>
   Array.from({ length: n }, (_, i) => ({ type, f: n === 1 ? 0.5 : i / (n - 1), v, ...extra }));
+import { AGES } from './model.js';
+
 const T = (de, en) => ({ de, en });
 
 export const CATALOG = [
@@ -248,6 +250,61 @@ export const CATALOG = [
     length: 8, minLength: 6, maxLength: 10, items: spread('hurdle', 4),
     name: T('Prellen über Hürden', 'Dribble over hurdles'),
     task: T('Prellend über die Minihürden steigen.', 'Dribble and step over the mini hurdles.') },
+  // --- age groups (round 4): Super-Minis / Minis, technique for E/D, athletics for C–A
+  { ref: 'tierwege', kind: 'lane', skill: 'movement', capacity: 1, flow: true, spotStep: 1.5, path: 'straight',
+    length: 8, minLength: 4, maxLength: 12, items: spread('disc', 4),
+    name: T('Tierwege', 'Animal walks'),
+    task: T('Von Teller zu Teller wie ein Tier: hüpfen wie ein Hase, watscheln wie eine Ente, schleichen wie eine Katze.',
+            'From marker to marker like an animal: hop like a rabbit, waddle like a duck, creep like a cat.') },
+  { ref: 'luftballon', kind: 'lane', skill: 'ballFeeling', capacity: 1, flow: true, spotStep: 2, path: 'straight',
+    length: 6, minLength: 4, maxLength: 10, items: spread('cone', 2),
+    name: T('Luftballon hochhalten', 'Keep the balloon up'),
+    task: T('Den Luftballon bis zum Hütchen immer wieder nach oben tippen. Er darf nicht auf den Boden fallen.',
+            'Tap the balloon up again and again until the cone. It must not touch the floor.') },
+  { ref: 'taeuschung', kind: 'lane', skill: 'dribbling', capacity: 1, flow: true, spotStep: 2.5, path: 'slalom',
+    length: 6, minLength: 4, maxLength: 10, items: [{ type: 'cone', f: 0.35, v: 0 }, { type: 'cone', f: 0.75, v: 0 }],
+    name: T('Körpertäuschung am Hütchen', 'Body feint at the cone'),
+    task: T('Prellend auf das Hütchen zulaufen, links antäuschen und rechts vorbei. Am zweiten Hütchen andersherum.',
+            'Dribble towards the cone, fake left and go past on the right. At the second cone the other way round.') },
+  { ref: 'zwei-baelle', kind: 'lane', skill: 'dribbling', capacity: 1, flow: true, spotStep: 2, path: 'straight',
+    length: 8, minLength: 5, maxLength: 12, items: spread('cone', 2),
+    name: T('Prellen mit zwei Bällen', 'Dribble two balls'),
+    task: T('Mit zwei Bällen gleichzeitig bis zum Hütchen prellen.', 'Dribble two balls at the same time up to the cone.') },
+  { ref: 'abwehr-viereck', kind: 'lane', skill: 'defence', capacity: 1, spotStep: 3, path: 'straight',
+    length: 3, minLength: 3, maxLength: 3,
+    items: [{ type: 'cone', u: 0.5, v: -1 }, { type: 'cone', u: 0.5, v: 1 }, { type: 'cone', u: 2.5, v: -1 }, { type: 'cone', u: 2.5, v: 1 }],
+    name: T('Abwehr-Viereck', 'Defence square'),
+    task: T('Im Hütchen-Viereck in Abwehrhaltung: seitwärts, vor, seitwärts, zurück. 2 Runden, Füße nicht kreuzen.',
+            'In defensive stance inside the cone square: sideways, forwards, sideways, back. 2 laps, do not cross the feet.') },
+  { ref: 'seilspringen', kind: 'lane', skill: 'movement', capacity: 2, spots: 'along', path: 'straight',
+    length: 2, minLength: 2, maxLength: 3, items: [{ type: 'disc', f: 0.5, v: 0.6 }],
+    name: T('Seilspringen', 'Skipping rope'),
+    task: T('Am Teller 20 Sprünge mit dem Springseil, beidbeinig.', 'At the marker, 20 jumps with the skipping rope, both feet.') },
+  { ref: 'lauf-abc', kind: 'lane', skill: 'movement', capacity: 1, flow: true, spotStep: 1.5, path: 'straight',
+    length: 10, minLength: 6, maxLength: 15, items: spread('cone', 3),
+    name: T('Lauf-ABC', 'Running drills'),
+    task: T('Bis zum mittleren Hütchen Skippings (kleine, schnelle Schritte), dann Anfersen bis zum Ende.',
+            'Skippings (small, fast steps) to the middle cone, then butt kicks to the end.') },
+  { ref: 'pendelsprint', kind: 'lane', skill: 'athletics', capacity: 1, spotStep: 2, path: 'straight',
+    length: 9, minLength: 6, maxLength: 12, items: spread('cone', 4),
+    name: T('Pendelsprint', 'Shuttle sprint'),
+    task: T('Zum zweiten Hütchen sprinten und zurück, dann zum dritten und zurück, dann bis zum letzten.',
+            'Sprint to the second cone and back, then to the third and back, then to the last one.') },
+  { ref: 'stuetz', kind: 'lane', skill: 'athletics', capacity: 2, spots: 'along', path: 'straight',
+    length: 2.5, minLength: 2.5, maxLength: 3, items: [{ type: 'mat', f: 0.5, v: 0.8 }],
+    name: T('Stütz-Station', 'Plank station'),
+    task: T('Auf der Matte 30 Sekunden Unterarmstütz, dann 10 Liegestütze.', 'On the mat: 30 seconds forearm plank, then 10 push-ups.') },
+  { ref: 'box-jumps', kind: 'lane', skill: 'athletics', capacity: 1, spots: 'along', path: 'straight',
+    length: 3, minLength: 3, maxLength: 3, items: [{ type: 'kasten', u: 1.5, v: 0.9 }, { type: 'mat', u: 1.5, v: -0.5 }],
+    name: T('Beidbeinig auf den Kasten', 'Box jumps'),
+    task: T('Beidbeinig auf den Kasten (3 Teile) springen, oben aufrichten, hinuntersteigen. 8-mal.',
+            'Jump with both feet onto the vaulting box (3 parts), stand up straight, step down. 8 times.') },
+  { ref: 'medizinball', kind: 'lane', skill: 'athletics', capacity: 2, spots: 'along', path: 'straight',
+    length: 2, minLength: 2, maxLength: 3, items: [{ type: 'disc', f: 0.5, v: 0.6 }],
+    arrows: [{ kind: 'throw', from: { f: 0.5, v: 0.2 }, to: { f: 0.5, v: -2.4 } }],
+    name: T('Medizinball an die Wand', 'Medicine ball against the wall'),
+    task: T('Am Teller den Medizinball (1–2 kg) beidhändig über Kopf 10-mal gegen die Wand werfen und fangen.',
+            'At the marker, throw the medicine ball (1–2 kg) with both hands over the head against the wall 10 times and catch it.') },
   // --- Torstationen / goal stations
   { ref: 'zielwurf', kind: 'goal', skill: 'throwing', capacity: 1,
     action: { u: 9, v: 0 }, target: { u: 0, v: 0 }, targetKind: 'throw',
@@ -305,6 +362,38 @@ export const CATALOG = [
     name: T('Zonen-Torwurf', 'Zone shooting'),
     task: T('Vom Teller aufs Tor werfen: Reifen oben = 3 Punkte, Reifen unten = 2, Tor = 1. Wer sammelt die meisten Punkte?',
             'Shoot at the goal from the marker: top hoop = 3 points, bottom hoop = 2, goal = 1. Who collects the most points?') },
+  { ref: 'ball-ins-tor', kind: 'goal', skill: 'throwing', capacity: 1,
+    action: { u: 4, v: 0 }, target: { u: 0, v: 0 }, targetKind: 'throw',
+    items: [{ type: 'disc', u: 4, v: 0 }, { type: 'cone', u: -0.4, v: -0.9 }, { type: 'cone', u: -0.4, v: 0.9 }, { type: 'ballbox', u: 6.5, v: 2.5 }],
+    name: T('Ball ins Tor rollen', 'Roll the ball into the goal'),
+    task: T('Vom Teller den Ball mit beiden Händen ins Tor rollen. Ball holen und zurück in die Kiste legen.',
+            'Roll the ball with both hands from the marker into the goal. Fetch it and put it back into the box.') },
+  { ref: 'dreischritt-wurf', kind: 'goal', skill: 'throwing', capacity: 1,
+    action: { u: 7.5, v: 0 }, target: { u: 0, v: 0 }, targetKind: 'throw', approach: { u: 12.5, v: 0.5 },
+    items: [{ type: 'hoop', u: 11, v: 0.3 }, { type: 'hoop', u: 9.8, v: -0.3 }, { type: 'hoop', u: 8.6, v: 0.3 }, { type: 'ballbox', u: 13, v: 3.5 }],
+    name: T('Dreischritt-Wurf', 'Three-step shot'),
+    task: T('Ball nehmen, mit 3 Schritten durch die Reifen (links – rechts – links) und mit Schlagwurf aufs Tor werfen.',
+            'Take a ball, 3 steps through the hoops (left – right – left) and shoot with an overarm throw.') },
+  { ref: 'rueckraumwurf', kind: 'goal', skill: 'throwing', capacity: 1,
+    action: { u: 9.5, v: 0 }, target: { u: 0, v: 0 }, targetKind: 'throw',
+    items: [{ type: 'kasten', u: 7.2, v: 0, w: 0.9, h: 1.5 }, { type: 'disc', u: 11.5, v: 0 }, { type: 'ballbox', u: 13, v: 3.5 }],
+    name: T('Rückraumwurf über den Kasten', 'Back-court shot over the box'),
+    task: T('Vom Teller anlaufen und aus 9–10 m mit Sprungwurf über den hohen Kasten aufs Tor werfen.',
+            'Run up from the marker and shoot from 9–10 m with a jump shot over the high box.') },
+  { ref: 'gegenstoss', kind: 'goal', skill: 'throwing', capacity: 1,
+    action: { u: 7, v: 0 }, target: { u: 0, v: 0 }, targetKind: 'throw', approach: { u: 13, v: 3 },
+    items: [{ type: 'helper', u: 0.6, v: -2.2 }, { type: 'ballbox', u: 0.6, v: -3.6 }],
+    arrows: [{ kind: 'pass', from: { u: 1, v: -1.9 }, to: { u: 10.5, v: 1.6 } }],
+    name: T('Gegenstoß', 'Fast break'),
+    task: T('Zum Tor sprinten. Der Helfer am Tor passt lang zu, den Ball im Laufen fangen und aufs Tor werfen.',
+            'Sprint towards the goal. The helper at the goal plays a long pass, catch it on the run and shoot.') },
+  { ref: 'kempa', kind: 'goal', skill: 'throwing', capacity: 1,
+    action: { u: 6.3, v: 0 }, target: { u: 0, v: 0 }, targetKind: 'throw',
+    items: [{ type: 'weichboden', u: 4.7, v: 0 }, { type: 'helper', u: 9, v: -3.5 }, { type: 'ballbox', u: 10, v: -5 }],
+    arrows: [{ kind: 'pass', from: { u: 8.7, v: -3.1 }, to: { u: 6.6, v: -0.3 } }],
+    name: T('Kempa-Trick', 'Kempa trick'),
+    task: T('Anlaufen, an der 6-m-Linie abspringen. Der Helfer spielt den Ball hoch über den Kreis: im Sprung fangen, in der Luft werfen, auf dem Weichboden landen.',
+            'Run up and take off at the 6 m line. The helper lobs the ball over the area: catch it in the air, shoot before landing, land on the crash mat.') },
   { ref: 'torstation', kind: 'goal', skill: 'other', capacity: 1,
     action: { u: 7, v: 0 }, target: null, items: [],
     name: T('Freie Torstation', 'Free goal station'),
@@ -314,12 +403,12 @@ export const CATALOG = [
 // Extra tags for the catalog filter where skill and material are not enough.
 const TAGS = {
   springen: ['huerdenlauf', 'reifenbahn', 'huepfkaestchen', 'kasten-sprung', 'baenke-springen', 'bank-hopser', 'kaenguru',
-    'sprungwurf', 'sprungwurf-kastendeckel', 'tarzan'],
+    'sprungwurf', 'sprungwurf-kastendeckel', 'tarzan', 'tierwege', 'seilspringen', 'box-jumps', 'kempa'],
   kriechen: ['bank-kriechen', 'kriechtunnel', 'purzelbaum', 'baumstammrolle', 'weichboden-berg', 'bank-ziehen', 'baerengang', 'krebsgang'],
   prellen: ['eins-gegen-eins', 'zielwurf', 'doppelpass-tor'],
-  werfen: ['schnur-werfen', 'hochwerfen-fangen'],
-  passen: ['doppelpass-tor'],
-  ball: ['krebsgang'],
+  werfen: ['schnur-werfen', 'hochwerfen-fangen', 'medizinball'],
+  passen: ['doppelpass-tor', 'gegenstoss', 'kempa'],
+  ball: ['krebsgang', 'medizinball'],
   klettern: ['schraege-bank', 'sprossenwand-klettern', 'kasten-sprung', 'tarzan'],
   balance: ['balancieren', 'wackelberg', 'weichboden-berg', 'prellen-bank'],
 };
@@ -440,6 +529,38 @@ const VARIANTS = {
     'Carry the ball and step over the mini hurdles.', 'Dribble and run over the mini hurdles – with the weak hand.'],
   'zonen-torwurf': ['Von näher werfen: jeder Treffer ins Tor zählt, Reifen zählen doppelt.', 'Nur die oberen Reifen zählen. Mit Schlagwurf aus dem Laufen werfen.',
     'Throw from closer: every goal counts, hoops count double.', 'Only the top hoops count. Overarm throw on the run.'],
+  tierwege: ['Wie ein Tier zum letzten Teller gehen. Das Kind sucht sich das Tier aus.', 'An jedem Teller ruft der Trainer ein neues Tier: Frosch, Storch (auf einem Bein), Hase, Krebs.',
+    'Move like an animal to the last marker. The child picks the animal.', 'At each marker the coach calls a new animal: frog, stork (on one leg), rabbit, crab.'],
+  luftballon: ['Den Luftballon tragen und zwischendurch hochwerfen und fangen.', 'Den Luftballon nur mit der schwachen Hand, dem Kopf oder dem Knie hochtippen.',
+    'Carry the balloon, throw it up and catch it now and then.', 'Tap the balloon up only with the weak hand, the head or the knee.'],
+  taeuschung: ['Ohne Ball auf das Hütchen zulaufen, links antäuschen und rechts vorbei.', 'Statt der Hütchen stehen Helfer, die mitgehen. Nach der Täuschung kräftig beschleunigen.',
+    'Run towards the cone without a ball, fake left and go past on the right.', 'Helpers who move along stand instead of the cones. Accelerate hard after the feint.'],
+  'zwei-baelle': ['Im Stand mit zwei Bällen prellen, dann gehend bis zum Hütchen.', 'Die zwei Bälle abwechselnd prellen (rechts, links) und dabei laufen.',
+    'Dribble two balls standing still, then walking up to the cone.', 'Dribble the two balls alternately (right, left) while running.'],
+  'abwehr-viereck': ['Einmal um das Viereck gehen: seitwärts mit Nachstellschritten, vor und zurück.', 'Der Trainer zeigt ein Hütchen. So schnell wie möglich in Abwehrhaltung hin, Arme oben.',
+    'Walk once around the square: side steps, forwards and back.', 'The coach points at a cone. Get there as fast as possible in defensive stance, arms up.'],
+  seilspringen: ['10 Sprünge, ein Zwischenhüpfer ist erlaubt.', '20 Sprünge auf dem linken Bein, 20 auf dem rechten. Oder das Seil 2-mal pro Sprung durchschlagen.',
+    '10 jumps, a small extra hop in between is allowed.', '20 jumps on the left leg, 20 on the right. Or turn the rope twice per jump.'],
+  'lauf-abc': ['Hopserlauf bis zum Hütchen.', 'Skippings, Anfersen, Kniehebelauf, ab dem letzten Drittel Sprint.',
+    'Skipping run up to the cone.', 'Skippings, butt kicks, high knees, sprint in the last third.'],
+  pendelsprint: ['Zum mittleren Hütchen sprinten, zurück traben, dann bis zum Ende laufen.', 'An jedem Wendepunkt den Boden mit der Hand berühren. Auf Zeit.',
+    'Sprint to the middle cone, jog back, then run to the end.', 'Touch the floor with the hand at every turn. Timed.'],
+  stuetz: ['20 Sekunden Unterarmstütz auf den Knien, dann 5 Liegestütze auf den Knien.', '30 Sekunden Seitstütz je Seite, dann 15 Liegestütze.',
+    '20 seconds forearm plank on the knees, then 5 push-ups on the knees.', '30 seconds side plank on each side, then 15 push-ups.'],
+  'box-jumps': ['2 Kastenteile, 5-mal.', '4 Kastenteile oder 10-mal ohne Pause. Weich und leise landen.',
+    '2 box parts, 5 times.', '4 box parts or 10 times without a break. Land softly and quietly.'],
+  medizinball: ['Mit einem 1-kg-Ball oder Handball, 8-mal.', '2-kg-Ball: 10 Würfe über Kopf, dann 10 seitlich mit Rumpfdrehung je Seite.',
+    'With a 1 kg ball or a handball, 8 times.', '2 kg ball: 10 overhead throws, then 10 from the side with a trunk twist on each side.'],
+  'ball-ins-tor': ['Ganz nah ans Tor gehen und den Ball hineinrollen.', 'Mit einer Hand rollen und zwischen die zwei Hütchen im Tor treffen.',
+    'Go very close to the goal and roll the ball in.', 'Roll with one hand and hit between the two cones in the goal.'],
+  'dreischritt-wurf': ['In jeden Reifen einen Schritt mit dem Ball in der Hand, dann aus dem Stand werfen.', 'Der Helfer passt zu: im Laufen fangen, 3 Schritte durch die Reifen, Sprungwurf.',
+    'One step into each hoop with the ball in the hand, then throw from standing.', 'The helper passes: catch on the run, 3 steps through the hoops, jump shot.'],
+  rueckraumwurf: ['Aus dem Stand mit Schlagwurf über den Kasten werfen.', 'Ball vom Helfer zugepasst bekommen, 3 Schritte, Sprungwurf in die oberen Ecken.',
+    'Overarm throw from standing over the box.', 'Get a pass from the helper, 3 steps, jump shot into the top corners.'],
+  gegenstoss: ['Kurzer Pass statt langem: Der Helfer passt an der 9-m-Linie zu, dann werfen.', 'Nach dem Fangen höchstens 3 Schritte, Abschluss mit Sprungwurf. Ein zweiter Helfer läuft als Abwehr hinterher.',
+    'Short pass instead of a long one: the helper passes at the 9 m line, then shoot.', 'At most 3 steps after the catch, finish with a jump shot. A second helper chases as a defender.'],
+  kempa: ['Den Ball im Sprung fangen und auf dem Weichboden landen, ohne zu werfen.', 'Wurf in die Ecke, die der Trainer zuruft. Der Helfer passt abwechselnd von links und rechts.',
+    'Catch the ball in the air and land on the crash mat without shooting.', 'Shoot into the corner the coach calls out. The helper passes from the left and the right in turn.'],
 };
 for (const [ref, [ed, hd, ee, he]] of Object.entries(VARIANTS)) Object.assign(CATALOG.find(c => c.ref === ref), { easy: T(ed, ee), hard: T(hd, he) });
 
@@ -449,15 +570,43 @@ const SECS = {
   'huetchen-abwerfen': 8, korbwurf: 8, 'baelle-abwehren': 12, 'eins-gegen-eins': 6, 'kasten-sprung': 6, tarzan: 8,
   baumstammrolle: 6, zielwurf: 6, sprungwurf: 6, 'sprungwurf-kastendeckel': 6, aufsetzer: 5, 'wurf-ueber-schnur': 5,
   'kegel-im-tor': 6, torhueter: 8, 'doppelpass-tor': 8, 'schraege-bank': 10, 'sprossenwand-klettern': 15,
-  'ball-fallen': 8, 'hochwerfen-drehen': 10, 'zonen-torwurf': 6,
+  'ball-fallen': 8, 'hochwerfen-drehen': 10, 'zonen-torwurf': 6, 'abwehr-viereck': 15, seilspringen: 20, pendelsprint: 15,
+  stuetz: 45, 'box-jumps': 25, medizinball: 30, 'ball-ins-tor': 6, 'dreischritt-wurf': 6, rueckraumwurf: 6, gegenstoss: 8, kempa: 8,
 };
 for (const [ref, secs] of Object.entries(SECS)) CATALOG.find(c => c.ref === ref).secs = secs;
 for (const [tag, refs] of Object.entries(TAGS)) for (const r of refs) (CATALOG.find(c => c.ref === r).tags ??= []).push(tag);
 
+// Age groups a station suits (from–to, see AGES in model.js). The catalog shows only the stations
+// for the selected Jugend.
+const AGE = {
+  'slalom-prellen': 'minis-C', 'zickzack-prellen': 'F-B', achterlauf: 'F-C', 'prellen-bank': 'minis-E', 'reifen-prellen': 'minis-E',
+  'prellen-reifen-stand': 'minis-E', 'ball-um-koerper': 'superminis-E', 'ball-rollen': 'superminis-F', 'ball-bank-rollen': 'superminis-F',
+  'hochwerfen-fangen': 'minis-E', 'schnur-werfen': 'minis-D', 'acht-beine': 'minis-D', 'pass-wand': 'minis-A', 'pass-helfer': 'minis-D',
+  'pass-kasten': 'minis-E', 'huetchen-abwerfen': 'minis-D', abwehrschritte: 'F-A', 'baelle-abwehren': 'minis-E', 'eins-gegen-eins': 'F-C',
+  'slalom-vorwaerts': 'superminis-C', koordinationsleiter: 'minis-A', huerdenlauf: 'superminis-A', reifenbahn: 'superminis-D',
+  huepfkaestchen: 'superminis-E', balancieren: 'superminis-E', 'bank-ziehen': 'superminis-F', 'bank-hopser': 'minis-A',
+  'baenke-springen': 'minis-D', 'bank-kriechen': 'superminis-F', kriechtunnel: 'superminis-F', baerengang: 'superminis-E',
+  'kasten-sprung': 'minis-D', 'weichboden-berg': 'superminis-F', purzelbaum: 'superminis-E', baumstammrolle: 'superminis-F',
+  seitgalopp: 'superminis-E', rueckwaerts: 'superminis-E', korbwurf: 'minis-E', 'unter-schnur-prellen': 'minis-E', kaenguru: 'minis-E',
+  krebsgang: 'minis-D', 'ball-transport': 'superminis-F', tarzan: 'minis-D', 'wandpass-lauf': 'E-A', 'schraege-bank': 'superminis-F',
+  'sprossenwand-klettern': 'superminis-E', 'ball-fallen': 'F-C', 'hochwerfen-drehen': 'F-D', wackelberg: 'superminis-F',
+  'prellen-huerden': 'F-D', tierwege: 'superminis-minis', luftballon: 'superminis-F', taeuschung: 'E-A', 'zwei-baelle': 'D-A',
+  'abwehr-viereck': 'D-A', seilspringen: 'E-A', 'lauf-abc': 'E-A', pendelsprint: 'E-A', stuetz: 'C-A', 'box-jumps': 'C-A',
+  medizinball: 'C-A', zielwurf: 'minis-E', sprungwurf: 'F-A', 'wurf-ueber-schnur': 'F-D', 'kegel-im-tor': 'minis-E', torhueter: 'minis-E',
+  aufsetzer: 'F-C', 'sprungwurf-kastendeckel': 'F-D', 'doppelpass-tor': 'F-A', 'zonen-torwurf': 'F-A', 'ball-ins-tor': 'superminis-minis',
+  'dreischritt-wurf': 'E-A', rueckraumwurf: 'D-A', gegenstoss: 'E-A', kempa: 'C-A', torstation: 'superminis-A',
+};
+for (const [ref, a] of Object.entries(AGE)) CATALOG.find(c => c.ref === ref).ages = a.split('-');
+// own stations without `ages` fit every group
+export const forAge = (e, g) => {
+  const i = AGES.indexOf(g);
+  return i < 0 || !e.ages || (AGES.indexOf(e.ages[0]) <= i && i <= AGES.indexOf(e.ages[1]));
+};
+
 // Catalog filter (dropdown). Works on catalog entries and on saved own stations.
 const tag = (e, t) => (e.tags || []).includes(t);
 const has = (e, ...types) => e.items.some(it => types.includes(it.type));
-const withBall = e => tag(e, 'ball') || (e.skill !== 'movement');
+const withBall = e => tag(e, 'ball') || !['movement', 'athletics'].includes(e.skill);
 export const FILTERS = [
   { id: 'all', f: () => true },
   { group: 'ball', id: 'ball', f: withBall },
@@ -471,6 +620,7 @@ export const FILTERS = [
   { group: 'activity', id: 'kriechen', f: e => tag(e, 'kriechen') },
   { group: 'activity', id: 'klettern', f: e => tag(e, 'klettern') },
   { group: 'activity', id: 'balance', f: e => tag(e, 'balance') },
+  { group: 'activity', id: 'athletik', f: e => e.skill === 'athletics' },
   { group: 'activity', id: 'tor', f: e => e.kind === 'goal' },
   { group: 'material', id: 'huetchen', f: e => has(e, 'cone') },
   { group: 'material', id: 'reifen', f: e => has(e, 'hoop') },
