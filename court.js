@@ -13,7 +13,13 @@ const COL = {
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = v => +v.toFixed(3);
 const pt = q => `${n(q.x)} ${n(q.y)}`;
-export const viewBox = p => { const { w, h } = hallOf(p); return `-1.6 -1 ${w + 3.2} ${h + 2}`; };
+// The drawing frame stays 40 x 20 m (the standard court); a smaller hall sits centred in it with blank
+// space around, so the canvas never changes size. Only a hall bigger than 40 x 20 enlarges the frame.
+function frame(p) {
+  const { w, h } = hallOf(p), W = Math.max(w, 40), H = Math.max(h, 20);
+  return { W, H, x0: -1.6 - (W - w) / 2, y0: -1 - (H - h) / 2 };
+}
+export const viewBox = p => { const f = frame(p); return `${n(f.x0)} ${n(f.y0)} ${n(f.W + 3.2)} ${n(f.H + 2)}`; };
 
 // Court lines for any hall size: goal areas (6 m) and free-throw lines (9 m) around each goal,
 // clipped to the hall; the centre line only when there are two goals.
@@ -194,7 +200,7 @@ function wrap(text, size, width, measure) {
 // everything fits one page. Returns { svg, overflow }.
 export function pageSVG(p, t, measure, date) {
   const W = 210, H = 297, M = 12, CW = W - 2 * M, F = 'Arial, Helvetica, sans-serif';
-  const { w: hw, h: hh } = hallOf(p), CH = Math.min(CW * (hh + 2) / (hw + 3.2), 120), CWc = CH * (hw + 3.2) / (hh + 2);
+  const { W: hw, H: hh } = frame(p), CH = Math.min(CW * (hh + 2) / (hw + 3.2), 120), CWc = CH * (hw + 3.2) / (hh + 2);
   const lay = layout(p), head = [`<rect width="${W}" height="${H}" fill="#fff"/>`];
   let y0 = M + 6;
   head.push(`<text x="${M}" y="${y0}" font-size="7" font-weight="700" fill="${COL.ink}">${esc(p.title || t('untitled'))}</text>`);
