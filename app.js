@@ -405,6 +405,8 @@ svg.addEventListener('pointerdown', e => {
   const key = `${kind}:${el.dataset.r}:${i}`, now = Date.now();
   if (kind === 'via' && lastDown.key === key && now - lastDown.at < 400) { lastDown = {}; return deleteCorner(+el.dataset.r, i); }
   lastDown = { key, at: now };
+  // equipment and throw spot of a station that is not selected: the first click selects (and drags) the whole station
+  if ((kind === 'item' || kind === 'action') && sel.st !== st) kind = 'station';
   if (kind === 'route' || kind === 'via' || kind === 'viamid') sel = { route: +el.dataset.r, vi: kind === 'via' ? i : undefined };
   else if (kind === 'free' || kind === 'rotfree') sel = { free: i };
   else if (kind === 'item' || kind === 'rotitem') sel = { st, item: i };
@@ -419,6 +421,7 @@ svg.addEventListener('pointerdown', e => {
   if (kind === 'rotfree') c = O.free[i];
   drag = { kind, st, i, r: +el.dataset.r, k: +(el.dataset.k || 0), c, p0: svgPt(e), O, lay, moved: false };
   svg.setPointerCapture(e.pointerId);
+  svg.classList.add('dragging');
   renderCourt();
   markList();
 });
@@ -436,6 +439,7 @@ const endDrag = () => {
   if (!drag) return;
   const moved = drag.moved;
   drag = null;
+  svg.classList.remove('dragging');
   pending = null;
   if (moved) renderAll();
 };

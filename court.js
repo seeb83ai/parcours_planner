@@ -113,6 +113,14 @@ export function courtInner(p, opts) {
   o.push(`<defs><marker id="${id}-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">${run}</marker>`
     + `<marker id="${id}-t" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">${thr}</marker></defs>`);
   o.push(courtLines(p, id));
+  const S = sel.st != null && lay[sel.st]?.fits ? sel.st : null;
+  const cur = on => `style="cursor:${on ? 'move' : 'pointer'}"`; // hand = click selects, move = selected, drag it
+  // click areas of the stations that are not selected (lowest layer: runs and items stay clickable on top)
+  if (edit) p.stations.forEach((st, i) => {
+    if (i === S || !lay[i].fits) return;
+    const b = stationBox(st, lay[i]);
+    o.push(`<rect data-drag="station" data-st="${i}" x="${n(b.x1)}" y="${n(b.y1)}" width="${n(b.x2 - b.x1)}" height="${n(b.y2 - b.y1)}" fill="transparent" ${cur(false)}/>`);
+  });
 
   // run connectors (lines with rounded corners; in the editor a wide invisible stroke makes them clickable)
   const cons = connectors(p, lay);
@@ -139,29 +147,28 @@ export function courtInner(p, opts) {
     if (st.kind === 'goal' && st.target) o.push(arrow([L.exit, toWorld(L.frame, st.target.u, st.target.v)], st.targetKind || 'throw', id));
   });
   // selection box of the selected station (behind the items, drag area for the whole station)
-  const S = sel.st != null && lay[sel.st]?.fits ? sel.st : null;
   if (edit && S != null) {
     const b = stationBox(p.stations[S], lay[S]);
     o.push(`<rect data-drag="station" data-st="${S}" x="${n(b.x1)}" y="${n(b.y1)}" width="${n(b.x2 - b.x1)}" height="${n(b.y2 - b.y1)}"
  rx="0.4" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="0.07" stroke-dasharray="0.3 0.2" style="cursor:move"/>`);
   }
   // start (not in circuit mode: groups begin at their station)
-  if (!zirkel) o.push(`<g ${edit ? 'data-drag="start" style="cursor:move"' : ''}><rect x="${n(p.start.x - START_LEN / 2)}" y="${n(p.start.y - 0.6)}" width="${START_LEN}" height="1.2" rx="0.3" fill="${COL.start}"/>`
+  if (!zirkel) o.push(`<g ${edit ? `data-drag="start" ${cur(true)}` : ''}><rect x="${n(p.start.x - START_LEN / 2)}" y="${n(p.start.y - 0.6)}" width="${START_LEN}" height="1.2" rx="0.3" fill="${COL.start}"/>`
     + `<text x="${n(p.start.x)}" y="${n(p.start.y + 0.2)}" text-anchor="middle" font-size="0.55" font-weight="700" fill="#fff">${esc(t('start'))}</text></g>`);
   // items
-  p.free.forEach((it, j) => o.push(placed(it, it, it.rot || 0, edit ? `data-drag="free" data-i="${j}" style="cursor:move"` : '', edit, sel.free === j, t)));
+  p.free.forEach((it, j) => o.push(placed(it, it, it.rot || 0, edit ? `data-drag="free" data-i="${j}" ${cur(sel.free === j)}` : '', edit, sel.free === j, t)));
   p.stations.forEach((st, i) => {
     const L = lay[i];
     if (!L.fits) return;
     for (const { it, j, k, q, rot } of placedItems(st, L))
-      o.push(placed(it, q, rot, edit ? `data-drag="item" data-st="${i}" data-i="${j}" data-k="${k}" style="cursor:move"` : '', edit, S === i && sel.item === j, t));
+      o.push(placed(it, q, rot, edit ? `data-drag="item" data-st="${i}" data-i="${j}" data-k="${k}" ${cur(S === i)}` : '', edit, S === i && sel.item === j, t));
     if (st.kind === 'goal')
-      o.push(`<circle ${edit ? `data-drag="action" data-st="${i}" style="cursor:move"` : ''} cx="${n(L.exit.x)}" cy="${n(L.exit.y)}" r="0.35" fill="#fff" stroke="${COL.throw}" stroke-width="0.12"/>`);
+      o.push(`<circle ${edit ? `data-drag="action" data-st="${i}" ${cur(S === i)}` : ''} cx="${n(L.exit.x)}" cy="${n(L.exit.y)}" r="0.35" fill="#fff" stroke="${COL.throw}" stroke-width="0.12"/>`);
   });
   // badges
   badges(p, lay).forEach((b, i) => {
     if (!b) return;
-    o.push(`<g ${edit ? `data-drag="badge" data-st="${i}" style="cursor:move"` : ''}><circle cx="${n(b.x)}" cy="${n(b.y)}" r="0.65" fill="${S === i ? '#0f766e' : COL.ink}"/>`
+    o.push(`<g ${edit ? `data-drag="badge" data-st="${i}" ${cur(S === i)}` : ''}><circle cx="${n(b.x)}" cy="${n(b.y)}" r="0.65" fill="${S === i ? '#0f766e' : COL.ink}"/>`
       + `<text x="${n(b.x)}" y="${n(b.y + 0.27)}" text-anchor="middle" font-size="0.75" font-weight="700" fill="#fff">${i + 1}</text></g>`);
   });
   // unsafe crossings (editor only)

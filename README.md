@@ -32,6 +32,7 @@ The interface is in German and English.
 - **Length:** drag the bar at the start or end of a selected station, or use the slider. Rows of cones, hoops, hurdles, mats or cone gates keep at least their spacing: an item is added as soon as it fits and removed when it no longer does.
 - **Hall size:** handball court 40 × 20 m, small gym 27 × 15 m, half court 20 × 20 m with one goal, or your own size. The lane, goals and court lines follow the hall.
 - **Free editing:**
+  - Click anywhere in the area of a station to select it. The first click on its equipment also selects the whole station; the second click selects the single item. The mouse pointer shows a hand wherever a click does something.
   - Drag stations, equipment and number badges. The arrow keys move the selection by 0.5 m (with Shift: 0.1 m), and Alt+drag moves it without the grid.
   - Rotate with Ctrl+drag or the ↻ handle, or by 90° with the R key. Delete with Del.
   - Duplicate a station with Ctrl+D or ⧉. The copy goes to the end of the track, with the same size and rotation. Reorder the stations by dragging their number in the list.

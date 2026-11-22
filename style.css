@@ -131,3 +131,4 @@ details.card[open] > summary::after { content: ' ▾'; }
 .levels button { font-size: 11px; padding: 2px 8px; border-radius: 6px; }
 .levels button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 @media (max-width: 560px) { .task-row { flex-direction: column; } .levels { flex-direction: row; } }
+#court.dragging, #court.dragging * { cursor: grabbing !important; }
