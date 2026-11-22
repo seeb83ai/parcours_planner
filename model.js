@@ -186,13 +186,34 @@ export function connectors(p, lay) {
       const a = prev.pt, b = L.exit;
       out.push({ type: 'curve', a, c: approachCtrl(st, L, a), b, st: i, ctrl: 'approach' });
     } else if (prev.st?.kind === 'goal') out.push(curveFrom(prev, L.entry));
-    else out.push({ type: 'line', to: i, pts: st.via ? [prev.pt, ...st.via, L.entry] : laneRoute(prev.pt, L.entry, G) });
+    else out.push(runLine(prev.pt, L.entry, st.via, G, i));
     prev = { pt: L.exit, st, L, i };
   });
   const fin = finishPoint(p);
-  out.push(prev.st?.kind === 'goal' ? curveFrom(prev, fin)
-    : { type: 'line', to: -1, pts: p.finishVia ? [prev.pt, ...p.finishVia, fin] : laneRoute(prev.pt, fin, G) });
+  out.push(prev.st?.kind === 'goal' ? curveFrom(prev, fin) : runLine(prev.pt, fin, p.finishVia, G, -1));
   return out;
+}
+
+// One run from the end of a station (a) to the start of the next (b). Corners drawn by the coach are
+// stored relative to a -> b ({ t: along, n: metres sideways}), so they move with the stations and the
+// run never comes apart. Without corners: along the lane, or straight when an end is off the lane or
+// the lane would be a long detour (e.g. a station turned against the running direction).
+const relFrame = (a, b) => { const L = Math.hypot(b.x - a.x, b.y - a.y) || 1e-9; return { L, ux: (b.x - a.x) / L, uy: (b.y - a.y) / L }; };
+const fromRel = (v, a, b) => {
+  if (v.t == null) return { x: v.x, y: v.y }; // older files: absolute corner
+  const { L, ux, uy } = relFrame(a, b);
+  return { x: a.x + v.t * L * ux - v.n * uy, y: a.y + v.t * L * uy + v.n * ux };
+};
+const toRel = (q, a, b) => {
+  const { L, ux, uy } = relFrame(a, b), dx = q.x - a.x, dy = q.y - a.y;
+  return { t: r3((dx * ux + dy * uy) / L), n: r3(-dx * uy + dy * ux) };
+};
+function runLine(a, b, via, G, to) {
+  if (via) return { type: 'line', to, pts: [a, ...via.map(v => fromRel(v, a, b)), b] };
+  const direct = { type: 'line', to, pts: [a, b] };
+  if (project(a, G).d > 0.5 || project(b, G).d > 0.5) return direct;
+  const lane = laneRoute(a, b, G), ll = polyLen(lane), dl = Math.hypot(b.x - a.x, b.y - a.y);
+  return ll > 3 * dl && ll - dl > 20 ? direct : { type: 'line', to, pts: lane };
 }
 
 // Corners of a run line (without its end points), and setting them (undefined = automatic lane route).
@@ -201,7 +222,12 @@ export function viaOf(p, lay, to) {
   return c ? c.pts.slice(1, -1).map(q => ({ x: r3(q.x), y: r3(q.y) })) : [];
 }
 export function setVia(p, to, via) {
-  if (to === -1) p.finishVia = via; else p.stations[to].via = via;
+  let rel;
+  if (via) {
+    const c = connectors(p, layout(p)).find(x => x.type === 'line' && x.to === to);
+    rel = c ? via.map(q => toRel(q, c.pts[0], c.pts.at(-1))) : undefined;
+  }
+  if (to === -1) p.finishVia = rel; else p.stations[to].via = rel;
 }
 
 // Default approach: bend through the corner (action.u, entry.v) in goal coordinates.
@@ -383,7 +409,8 @@ export const emptyParcours = () => ({
 });
 
 // Trust boundary for imported files and shared links.
-const okVia = v => v == null || (Array.isArray(v) && v.length <= 50 && v.every(q => Number.isFinite(q?.x) && Number.isFinite(q?.y)));
+const okVia = v => v == null || (Array.isArray(v) && v.length <= 50
+  && v.every(q => (Number.isFinite(q?.t) && Number.isFinite(q?.n)) || (Number.isFinite(q?.x) && Number.isFinite(q?.y))));
 const okStation = s => s && Array.isArray(s.items) && okVia(s.via)
   && ((s.kind === 'lane' && Number.isFinite(s.length)) || (s.kind === 'goal' && Number.isFinite(s.action?.u)))
   && s.items.every(it => it && ITEM_TYPES[it.type]);

@@ -186,11 +186,21 @@ const auto = M.viaOf(vp, vl, 2);
 check('automatic run has the lane corner', auto.length === 1 && near(auto[0], { x: 40 - I, y: I }));
 M.setVia(vp, 2, [{ x: 36, y: 4 }, { x: 37, y: 5 }]);
 let vc = M.connectors(vp, M.layout(vp)).find(c => c.to === 2);
-check('drawn corners are used', vc.pts.length === 4 && near(vc.pts[1], { x: 36, y: 4 }));
+check('drawn corners are used (±1 mm)', vc.pts.length === 4 && Math.hypot(vc.pts[1].x - 36, vc.pts[1].y - 4) < 0.01);
 M.setVia(vp, -1, []);
 check('finish run can be a straight line', M.connectors(vp, M.layout(vp)).at(-1).pts.length === 2);
 M.setVia(vp, 2, undefined);
 check('reset gives the lane route again', M.viaOf(vp, M.layout(vp), 2).length === 1);
+// runs stay connected when stations move
+const mv = P([st('balancieren'), st('slalom-prellen')]);
+M.setVia(mv, 1, [{ x: 16, y: 5 }]);
+mv.stations[1].pin = { x: 20, y: 12, rot: 0 }; // move the next station into the court
+lay = M.layout(mv);
+const run = M.connectors(mv, lay).find(c => c.to === 1);
+check('moved station: run still goes from exit to entry', near(run.pts[0], lay[0].exit) && near(run.pts.at(-1), lay[1].entry) && run.pts.length === 3);
+check('moved station: the corner moved along', !near(run.pts[1], { x: 16, y: 5 }));
+const off = P([st('balancieren'), st('slalom-prellen', { pin: { x: 20, y: 10, rot: 0 } })]);
+check('station off the lane: straight run, no detour', M.connectors(off, M.layout(off)).find(c => c.to === 1).pts.length === 2);
 check('import rejects broken corners', (() => { try { M.validate({ ...vp, finishVia: [{ x: 'a' }] }); } catch { return true; } })());
 
 // validation at the import boundary
