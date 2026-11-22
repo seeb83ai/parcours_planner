@@ -49,11 +49,11 @@ The interface is in German and English.
   - Missing equipment compared with the hall's stock.
   - Stations that no longer fit.
 - **Output and sharing:**
-  - **Link teilen** (share link): the whole parcours fits into a link that you can send in a messenger. There is no server, so the link itself carries the data.
-  - Print on A4 portrait: the court, one description per station, notes and the equipment list. When there is a lot of text, it shrinks or goes into two columns, so that everything stays on one page.
-  - The same page as a PNG.
+  - **Link teilen** (share link, share symbol): the whole parcours fits into a link that you can send in a messenger. There is no server, so the link itself carries the data.
+  - Print on A4 portrait (printer symbol): the court, one description per station, notes and the equipment list. When there is a lot of text, it shrinks or goes into two columns, so that everything stays on one page.
+  - The same page as a PNG (picture symbol).
   - **Meine Parcours** (my parcours): keep several parcours in the browser.
-  - Save and load the parcours as a JSON file.
+  - Save and load the parcours as a JSON file (down and up arrows: export and import). Hover a symbol to see its name.
   - **Aufbau** (set-up): a checklist for the phone that shows the equipment station by station.
 - **16 ready-made parcours** ("Vorlage laden"), at least 4 for each age group. The list shows only the templates for the chosen age group:
 
@@ -86,7 +86,7 @@ Quick start:
 2. Pick a station in the list on the left. It goes onto the lane.
 3. Click a station on the court or in the list to select it. Drag to move it, drag the bar at its start or end to change its length, and use the ↻ handle to rotate it.
 4. Change the name, task text, length and places below the court.
-5. Use **Link teilen**, **PNG** or **Drucken** (print) to share the plan. **Meine Parcours** keeps several parcours in the browser. **Exportieren** (export) saves the parcours as a JSON file, and **Importieren** loads one.
+5. Use the share, picture (PNG) or printer symbol to share the plan. **Meine Parcours** keeps several parcours in the browser. The down arrow (export) saves the parcours as a JSON file, and the up arrow (import) loads one.
 
 ### Keyboard
 

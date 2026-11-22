@@ -598,6 +598,7 @@ $('tpl').addEventListener('change', e => {
   if (!def.mode) Object.assign(next, { mode: P.mode ?? 'parcours', rotation: P.rotation ?? 3 });
   replace(next);
 });
+$('file').parentElement.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } });
 $('file').addEventListener('change', async e => {
   const f = e.target.files[0];
   e.target.value = '';

@@ -68,6 +68,7 @@ input, textarea { border: 1px solid var(--line); border-radius: 8px; padding: 6p
 
 .gh { display: grid; place-items: center; color: var(--ink); padding: 0 4px; }
 .gh:hover { color: var(--accent); }
+button.icon, .btn.icon { display: inline-grid; place-items: center; padding: 6px 8px; }
 .help-btn { font-weight: 700; width: 34px; border-radius: 50%; padding: 6px 0; }
 .help { max-width: 640px; width: calc(100% - 32px); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; color: var(--ink); background: var(--card); }
 .help::backdrop { background: rgba(17, 24, 39, 0.45); }
