@@ -2,12 +2,15 @@
 import * as M from './model.js';
 import { CATALOG, FILTERS, forAge } from './stations.js';
 import { PRESETS, buildPreset } from './presets.js';
+import { caption } from './court.js';
 
 const results = [];
 const check = (name, ok) => results.push([name, !!ok]);
 const st = (ref, o = {}) => Object.assign(M.newStation(CATALOG.find(c => c.ref === ref), 'de'), o);
 const P = stations => ({ ...M.emptyParcours(), stations });
 const near = (a, b) => Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6;
+check('badge caption wraps at spaces, two lines at most', JSON.stringify(caption('Sprungwurf über die Bank')) === '["Sprungwurf über","die Bank"]'
+  && JSON.stringify(caption('Luftballon hochhalten und fangen')) === '["Luftballon","hochhalten und…"]' && caption('Wackelberg').length === 1);
 
 // lane placement: first station after start box + gap
 let lay = M.layout(P([st('slalom-prellen')]));
