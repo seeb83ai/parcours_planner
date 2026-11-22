@@ -13,7 +13,8 @@ const ctx = document.createElement('canvas').getContext('2d');
 const measure = (s, size) => { ctx.font = `${size * 10}px Arial, Helvetica, sans-serif`; return ctx.measureText(s).width / 10; };
 const locale = () => (getLang() === 'de' ? 'de-DE' : 'en-GB');
 const today = () => new Date().toLocaleDateString(locale());
-const mmss = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')} min`;
+// under a minute in seconds ("21 s"), otherwise minutes ("1:45 min"), so "0:21 min" cannot be misread
+const mmss = s => (s = Math.round(s)) < 60 ? `${s} s` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} min`;
 const { norm, rotateStation, r3 } = M;
 
 let P = (() => { try { return M.validate(store.get('parcours.draft')); } catch { return M.emptyParcours(); } })();
