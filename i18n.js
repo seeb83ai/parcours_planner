@@ -16,7 +16,6 @@ const DICT = {
     'app.title': 'Parcours-Planer', untitled: 'Parcours ohne Titel', start: 'Start / Ziel', children: 'Kinder', material: 'Material',
     'tb.new': 'Neu', 'tb.template': 'Vorlage laden …', 'tb.import': 'Importieren', 'tb.export': 'JSON speichern',
     'tb.png': 'PNG', 'tb.print': 'Drucken', 'tb.undo': 'Rückgängig', 'tb.redo': 'Wiederholen',
-    'tpl.parcours1': 'Bewegungs-Parcours', 'tpl.parcours2': 'Ball-Parcours F-Jugend',
     'side.catalog': 'Stationen', 'side.filter': 'Suchen …', 'side.palette': 'Material hinzufügen', 'side.settings': 'Gruppe',
     'side.hints': 'Hinweise', 'side.material': 'Materialliste', 'side.custom': 'Eigene Stationen',
     'palette.toStation': 'Wird zu Station {n} hinzugefügt.', 'palette.free': 'Keine Station ausgewählt: freies Material.',
@@ -38,7 +37,7 @@ const DICT = {
     'item.cone': 'Hütchen', 'item.hoop': 'Reifen', 'item.disc': 'Markierungsteller', 'item.helper': 'Helfer',
     'item.bench': 'Bank', 'item.kastendeckel': 'Kastendeckel', 'item.mat': 'Matte', 'item.weichboden': 'Weichboden',
     'item.ballbox': 'Ballkiste', 'item.minigoal': 'Mini-Tor', 'item.balls': 'Bälle',
-    'item.kasten': 'Kasten', 'item.hurdle': 'Minihürde', 'item.ladder': 'Koordinationsleiter', 'item.rope': 'Zauberschnur', 'item.tunnel': 'Kriechtunnel',
+    'item.kasten': 'Kasten', 'item.hurdle': 'Minihürde', 'item.ladder': 'Koordinationsleiter', 'item.rope': 'Zauberschnur', 'item.tunnel': 'Kriechtunnel', 'item.tau': 'Tau',
   },
   en: {
     'tb.help': 'Help', 'help.close': 'Close', 'help.title': 'How the parcours planner works', 'help.keys': 'Keyboard shortcuts',
@@ -57,7 +56,6 @@ const DICT = {
     'app.title': 'Parcours Planner', untitled: 'Untitled parcours', start: 'Start / Finish', children: 'children', material: 'Equipment',
     'tb.new': 'New', 'tb.template': 'Load template …', 'tb.import': 'Import', 'tb.export': 'Save JSON',
     'tb.png': 'PNG', 'tb.print': 'Print', 'tb.undo': 'Undo', 'tb.redo': 'Redo',
-    'tpl.parcours1': 'Movement parcours', 'tpl.parcours2': 'Ball parcours U9',
     'side.catalog': 'Stations', 'side.filter': 'Search …', 'side.palette': 'Add equipment', 'side.settings': 'Group',
     'side.hints': 'Hints', 'side.material': 'Equipment list', 'side.custom': 'My stations',
     'palette.toStation': 'Will be added to station {n}.', 'palette.free': 'No station selected: free equipment.',
@@ -79,7 +77,7 @@ const DICT = {
     'item.cone': 'Cone', 'item.hoop': 'Hoop', 'item.disc': 'Marker disc', 'item.helper': 'Helper',
     'item.bench': 'Bench', 'item.kastendeckel': 'Box top', 'item.mat': 'Mat', 'item.weichboden': 'Crash mat',
     'item.ballbox': 'Ball box', 'item.minigoal': 'Mini goal', 'item.balls': 'Balls',
-    'item.kasten': 'Vaulting box', 'item.hurdle': 'Mini hurdle', 'item.ladder': 'Agility ladder', 'item.rope': 'Rope', 'item.tunnel': 'Crawl tunnel',
+    'item.kasten': 'Vaulting box', 'item.hurdle': 'Mini hurdle', 'item.ladder': 'Agility ladder', 'item.rope': 'Rope', 'item.tunnel': 'Crawl tunnel', 'item.tau': 'Climbing rope',
   },
 };
 

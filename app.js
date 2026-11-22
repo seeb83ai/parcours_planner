@@ -1,5 +1,6 @@
 import { t, setLang, getLang } from './i18n.js';
 import { CATALOG } from './stations.js';
+import { PRESETS, buildPreset } from './presets.js';
 import * as M from './model.js';
 import { courtInner, pageSVG, esc, badgePos, stationBox, itemPlace } from './court.js';
 
@@ -49,6 +50,8 @@ function renderAll() {
   $('group').value = P.group;
   $('children').value = P.children;
   $('interval').value = P.interval;
+  $('tpl').innerHTML = `<option value="">${esc(t('tb.template'))}</option>`
+    + PRESETS.map(d => `<option value="${d.id}">${esc(d.title[getLang()] ?? d.title.de)}</option>`).join('');
   renderCatalog();
   renderStations();
   renderCourt();
@@ -363,12 +366,10 @@ for (const id of ['title', 'group', 'children', 'interval']) {
 }
 
 $('btn-new').addEventListener('click', () => replace(M.emptyParcours()));
-$('tpl').addEventListener('change', async e => {
-  const v = e.target.value;
+$('tpl').addEventListener('change', e => {
+  const def = PRESETS.find(d => d.id === e.target.value);
   e.target.value = '';
-  if (!v) return;
-  const res = await fetch(`templates/${v}.json`);
-  replace(M.validate(await res.json()));
+  if (def) replace(buildPreset(def, getLang()));
 });
 $('file').addEventListener('change', async e => {
   const f = e.target.files[0];

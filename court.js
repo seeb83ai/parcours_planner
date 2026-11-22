@@ -8,7 +8,7 @@ const COL = {
   bench: ['#a0692f', '#6b4423'], kastendeckel: ['#9ca3af', '#4b5563'], mat: ['#4f8fd1', '#1e5a96'],
   weichboden: ['#1e3a8a', '#1e3a8a'], ballbox: ['#fde68a', '#b45309'], minigoal: ['#ffffff', '#374151'],
   kasten: ['#d6b58a', '#7c5a2e'], hurdle: ['#ef4444', '#991b1b'], ladder: ['#fef9c3', '#a16207'],
-  rope: ['#475569', '#475569'], tunnel: ['#86efac', '#15803d'],
+  rope: ['#475569', '#475569'], tunnel: ['#86efac', '#15803d'], tau: ['#d6b58a', '#78350f'],
 };
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = v => +v.toFixed(3);
@@ -43,6 +43,7 @@ function shape(it) {
 // Labels stay upright, whatever the item rotation.
 const label = (it, t) => ({
   helper: '<text y="0.18" text-anchor="middle" font-size="0.5" font-weight="700" fill="#fff">H</text>',
+  tau: '<text y="0.15" text-anchor="middle" font-size="0.4" font-weight="700" fill="#78350f">T</text>',
   ballbox: `<text y="0.18" text-anchor="middle" font-size="0.5" font-weight="700" fill="#78350f">${esc(t('item.balls'))}</text>`,
 }[it.type] || '');
 

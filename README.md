@@ -8,7 +8,7 @@ The interface is in German and English.
 
 - **Step-by-step building:** pick a station from the catalog. It goes on a lane 2.5 m inside the walls, after the selected station.
 - **Goal stations:** at most one in front of each goal. They have a throw spot and a run path that you can bend.
-- **Catalog with 43 stations:** dribbling, ball feeling, passing, throwing, defence and movement. The stations follow common F-Jugend exercises, for example from the BWHV/HVW Kinderhandball catalog.
+- **Catalog with 51 stations:** dribbling, ball feeling, passing, throwing, defence and movement. The stations follow common F-Jugend exercises, for example from the BWHV/HVW Kinderhandball catalog.
 - **Places (Plätze):** more places repeat a station's set-up side by side or one after another. The equipment list counts every place.
 - **Length:** drag the bar at the start or end of a selected station, or use the slider. Rows of cones, hoops, hurdles, mats or cone gates keep at least their spacing: an item is added as soon as it fits and removed when it no longer does.
 - **Free editing:** drag stations, equipment and number badges. Rotate with Ctrl+drag or the ↻ handle, or by 90° with the R key. Delete with Del. You can also add extra equipment.
@@ -17,7 +17,14 @@ The interface is in German and English.
   - Print on A4 portrait: the court, one description per station, and the equipment list.
   - The same page as a PNG.
   - Save and load the parcours as a JSON file.
-- **Templates:** a movement parcours and a ball parcours for the F-Jugend.
+- **7 ready-made parcours** ("Vorlage laden"):
+  - Bewegungs-Parcours
+  - Ball-Parcours
+  - Koordinations-Parcours
+  - Prellen & Werfen
+  - Turnhallen-Abenteuer
+  - Mit wenig Material (only cones, hoops and discs)
+  - Pass- und Wurf-Zirkel
 - **Your own stations:** save a changed station as your own (☆). The browser keeps your stations and the current draft.
 
 ## Use it
@@ -62,7 +69,7 @@ All paths are relative, so you can serve the folder from any web server:
 | `court.js` | SVG drawing of the court and the A4 print page |
 | `stations.js` | Station catalog |
 | `i18n.js` | German and English UI texts |
-| `templates/*.json` | Ready-made parcours |
+| `presets.js` | Ready-made parcours, built from the catalog when loaded |
 | `test.js`, `test.html` | Logic checks |
 | `PLAN.md` | Design decisions and the data format (schemaVersion 2) |
 | `drafts/` | Original research, scripts and design drafts |
@@ -72,6 +79,10 @@ To run the tests:
 ```sh
 node test.js        # or open test.html in the browser
 ```
+
+### Add a preset
+
+Add an entry to `PRESETS` in `presets.js`. It lists catalog stations in clockwise order, with an optional `length` and `capacity` for each station. The app builds the preset from the current catalog, in the chosen language. `node test.js` checks that every station of every preset fits on the lane.
 
 ### Add a station
 

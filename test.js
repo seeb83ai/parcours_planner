@@ -1,6 +1,7 @@
 // Layout logic checks. Run: `node test.js`, or open test.html in the browser.
 import * as M from './model.js';
 import { CATALOG } from './stations.js';
+import { PRESETS, buildPreset } from './presets.js';
 
 const results = [];
 const check = (name, ok) => results.push([name, !!ok]);
@@ -103,6 +104,13 @@ check('across: second track 2.2 m inside, same length', M.span(sl) === 10 && M.s
 const cm = Object.fromEntries(M.material(P([sl, pw])).map(m => [m.type, m.n]));
 check('material counts every place', cm.cone === 10 && cm.disc === 3);
 check('every catalog station is valid', !(() => { try { M.validate(P(CATALOG.map(c => st(c.ref)))); } catch { return true; } })());
+
+// every preset is valid and fits completely on the lane, in both languages
+for (const def of PRESETS) for (const lang of ['de', 'en']) {
+  const pp = buildPreset(def, lang), ll = M.layout(pp);
+  const bad = pp.stations.filter((s, i) => !ll[i].fits).map(s => s.name);
+  check(`preset ${def.id} (${lang}) fits: ${bad.join(', ') || 'all'}`, !bad.length && !(() => { try { M.validate(pp); } catch { return true; } })());
+}
 
 // validation at the import boundary
 const bad = x => { try { M.validate(x); return false; } catch { return true; } };
