@@ -38,7 +38,7 @@ export const ITEM_TYPES = {
   bench: { w: 4, h: 0.4 }, kastendeckel: { w: 0.9, h: 0.7 }, mat: { w: 2, h: 1 },
   weichboden: { w: 2, h: 3 }, ballbox: { w: 2, h: 1 }, minigoal: { w: 0.6, h: 1.8 },
   kasten: { w: 1.5, h: 0.9 }, hurdle: { w: 0.15, h: 0.8 }, ladder: { w: 4, h: 0.5 }, rope: { w: 0.06, h: 3 },
-  tunnel: { w: 2, h: 0.7 }, tau: { r: 0.3 },
+  tunnel: { w: 2, h: 0.7 }, tau: { r: 0.3 }, sprossenwand: { w: 2, h: 0.25 },
 };
 
 const cs = deg => { const r = deg * Math.PI / 180; return [Math.round(Math.cos(r) * 1e9) / 1e9, Math.round(Math.sin(r) * 1e9) / 1e9]; };
@@ -396,6 +396,11 @@ export function newStation(entry, lang) {
   const tx = v => (typeof v === 'string' ? v : v?.[lang] ?? v?.de ?? '');
   const st = structuredClone(entry);
   Object.assign(st, { name: tx(entry.name), task: tx(entry.task), badge: null });
+  // easier / harder task texts (catalog: per language; own stations: already plain strings in `variants`)
+  if (entry.easy || entry.hard) st.variants = { easy: tx(entry.easy), normal: tx(entry.task), hard: tx(entry.hard) };
+  if (st.variants) st.level ??= 'normal';
+  delete st.easy;
+  delete st.hard;
   st.arrows ??= [];
   if (st.kind === 'lane') st.pin = null;
   else Object.assign(st, { approach: entry.approach ?? null, exitCtrl: null });

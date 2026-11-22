@@ -123,3 +123,10 @@ details.card[open] > summary::after { content: ' ▾'; }
 .timer-clock { font: 700 72px/1.1 'Space Grotesk', Inter, sans-serif; margin: 8px 0; color: var(--accent); font-variant-numeric: tabular-nums; }
 .timer .row-btns { justify-content: center; }
 .timer .row-btns button { font-size: 15px; padding: 8px 16px; }
+
+.task-row { display: flex; gap: 8px; align-items: stretch; margin-top: 6px; }
+.task-row textarea { margin-top: 0; flex: 1; }
+.levels { display: flex; flex-direction: column; gap: 3px; }
+.levels button { font-size: 11px; padding: 2px 8px; border-radius: 6px; }
+.levels button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+@media (max-width: 560px) { .task-row { flex-direction: column; } .levels { flex-direction: row; } }

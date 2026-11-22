@@ -174,12 +174,14 @@ function renderStations() {
       !L.fits && `<span class="flag warn">${esc(t('st.nofit'))}</span>`].filter(Boolean).join('');
     const len = st.kind === 'lane' && st.maxLength > st.minLength
       ? `<label>${esc(t('st.length'))} <input type="range" data-f="length" min="${st.minLength}" max="${st.maxLength}" step="0.5" value="${st.length}"><output>${st.length} m</output></label>` : '';
+    const levels = st.variants ? `<div class="levels" role="group" aria-label="${esc(t('level.label'))}">`
+      + ['easy', 'normal', 'hard'].map(l => `<button data-level="${l}" aria-pressed="${(st.level ?? 'normal') === l}">${esc(t('level.' + l))}</button>`).join('') + '</div>' : '';
     const secs = zirkel ? '' : `<label>${esc(t('st.secs'))} <input type="number" data-f="secs" min="1" max="120" value="${M.stationSecs(st)}"></label>`;
     return `<li class="st${sel.st === i ? ' sel' : ''}${L.fits ? '' : ' bad'}" data-i="${i}">
 <span class="badge" draggable="true" title="${esc(t('st.drag'))}">${i + 1}</span>
 <div><div class="st-head"><input data-f="name" value="${esc(st.name)}" aria-label="Name">${flags}
 ${ib('up', 'st.up', '↑')}${ib('down', 'st.down', '↓')}${ib('dup', 'st.dup', '⧉')}${ib('custom', 'st.saveCustom', '☆')}${ib('del', 'st.delete', '✕')}</div>
-<textarea data-f="task" rows="2" aria-label="Aufgabe">${esc(st.task)}</textarea>
+<div class="task-row"><textarea data-f="task" rows="2" aria-label="Aufgabe">${esc(st.task)}</textarea>${levels}</div>
 <div class="st-meta">${len}<label>${esc(t('st.capacity'))} <input type="number" data-f="capacity" min="1" max="6" value="${st.capacity}"></label>${secs}</div></div></li>`;
   }).join('');
 }
@@ -275,6 +277,14 @@ function stationAction(act, i) {
   if (act === 'dup') return duplicate(i);
   if (act === 'up' || act === 'down') return moveStation(i, act === 'up' ? i - 1 : i + 1);
   if (act === 'del') change(() => { P.stations.splice(i, 1); sel = {}; });
+}
+
+// Easier / normal / harder: swaps the task text only. Asks first if the coach changed the text by hand.
+function setLevel(i, level) {
+  const st = P.stations[i], cur = st.level ?? 'normal';
+  if (!st.variants || level === cur) return;
+  if (st.task !== st.variants[cur] && !confirm(t('level.confirm'))) return;
+  change(() => { st.task = st.variants[level]; st.level = level; sel = { st: i }; });
 }
 
 function replace(next) {
@@ -493,6 +503,8 @@ list.addEventListener('change', e => { if (/length|capacity/.test(e.target.datas
 list.addEventListener('click', e => {
   const li = e.target.closest('li[data-i]');
   if (!li) return;
+  const lb = e.target.closest('button[data-level]');
+  if (lb) return setLevel(+li.dataset.i, lb.dataset.level);
   const b = e.target.closest('button[data-act]');
   if (b) return stationAction(b.dataset.act, +li.dataset.i);
   if (sel.st !== +li.dataset.i) { sel = { st: +li.dataset.i }; renderCourt(); markList(); }

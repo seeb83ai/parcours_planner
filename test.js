@@ -203,6 +203,12 @@ const off = P([st('balancieren'), st('slalom-prellen', { pin: { x: 20, y: 10, ro
 check('station off the lane: straight run, no detour', M.connectors(off, M.layout(off)).find(c => c.to === 1).pts.length === 2);
 check('import rejects broken corners', (() => { try { M.validate({ ...vp, finishVia: [{ x: 'a' }] }); } catch { return true; } })());
 
+// easier / harder texts: every catalog station except the free goal station has both, base texts stay clean
+check('variants for all stations', CATALOG.filter(c => c.ref !== 'torstation').every(c => c.easy?.de && c.hard?.de && c.easy?.en && c.hard?.en));
+check('no "Schwerer:" left in the normal texts', CATALOG.every(c => !/Schwerer:|Harder:/.test(c.task.de + c.task.en)));
+const lv = st('slalom-prellen');
+check('station gets its 3 texts in the chosen language', lv.level === 'normal' && lv.variants.hard.includes('schwachen') && lv.task === lv.variants.normal && !lv.easy);
+
 // validation at the import boundary
 const bad = x => { try { M.validate(x); return false; } catch { return true; } };
 check('validate rejects schema 1', bad({ schemaVersion: 1, stations: [] }));

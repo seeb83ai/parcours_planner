@@ -17,11 +17,12 @@ The interface is in German and English.
 
 - **Step-by-step building:** pick a station from the catalog. It goes on a lane 2.5 m inside the walls, after the selected station.
 - **Goal stations:** at most one in front of each goal. They have a throw spot and a run path that you can bend.
-- **Catalog with 52 stations:** dribbling, ball feeling, passing, throwing, defence and movement. The stations follow common F-Jugend exercises, for example from the BWHV/HVW Kinderhandball catalog.
+- **Catalog with 60 stations:** dribbling, ball feeling, passing, throwing, defence and movement. The stations follow common F-Jugend exercises, for example from the BWHV/HVW Kinderhandball catalog.
 - **Filter:** narrow the catalog with a dropdown:
   - by ball: with ball, without ball
-  - by activity: dribbling, passing, throwing, ball feeling, defence, jumping, crawling and rolling, goal stations
+  - by activity: dribbling, passing, throwing, ball feeling, defence, jumping, crawling and rolling, climbing, balance, goal stations
   - by equipment: cones, hoops, bench, mat, box, helper needed, little equipment
+- **Easier / harder:** each station has three task texts (Leichter / Normal / Schwerer). The switch next to the task text only changes the text; the set-up stays the same. If you changed the text by hand, the app asks before replacing it.
 - **Places (Plätze):** more places repeat a station's set-up side by side or one after another. The equipment list counts every place.
 - **Length:** drag the bar at the start or end of a selected station, or use the slider. Rows of cones, hoops, hurdles, mats or cone gates keep at least their spacing: an item is added as soon as it fits and removed when it no longer does.
 - **Hall size:** handball court 40 × 20 m, small gym 27 × 15 m, half court 20 × 20 m with one goal, or your own size. The lane, goals and court lines follow the hall.
