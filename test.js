@@ -162,6 +162,23 @@ check('5 benches needed, 4 in stock', sh.length === 1 && sh[0].type === 'bench' 
 check('own stations validate', !(() => { try { M.validateStations([st('pass-wand')]); } catch { return true; } })()
   && (() => { try { M.validateStations([{ kind: 'lane', items: [{ type: 'rocket' }], length: 2 }]); } catch { return true; } })());
 
+// duplicating: copy goes to the end of the track, keeps size and rotation, or is refused when full
+const dp = P([st('slalom-prellen', { length: 12 }), st('balancieren'), st('zielwurf')]);
+M.resize(dp.stations[0], 12);
+const d0 = M.duplicateStation(dp, 0);
+dp.stations.push(d0);
+lay = M.layout(dp);
+check('copy goes behind the last station (after the goal)', lay[3].side === 2 && d0.length === 12 && cones(d0).length === cones(dp.stations[0]).length);
+const rp = P([st('balancieren'), st('slalom-prellen')]);
+let dl = M.layout(rp);
+M.rotateStation(rp.stations[0], structuredClone(rp.stations[0]), dl[0], { x: I + 8, y: I }, 90);
+const rc = M.duplicateStation(rp, 0);
+rp.stations.push(rc);
+dl = M.layout(rp);
+check('copy keeps a 90° rotation relative to its lane', rc.pin && M.norm(rc.pin.rot - 0) === 90 && dl[2].fits);
+const full = P(Array.from({ length: 6 }, () => st('slalom-prellen', { length: 14 })));
+check('no room left: copy is refused', M.duplicateStation(full, 0) === null);
+
 // validation at the import boundary
 const bad = x => { try { M.validate(x); return false; } catch { return true; } };
 check('validate rejects schema 1', bad({ schemaVersion: 1, stations: [] }));

@@ -319,6 +319,27 @@ export function rotateStation(st, stO, L, c, th) {
   stO.items.forEach((o, k) => Object.assign(st.items[k], uv(o), { rot: norm((o.rot || 0) + th) }));
 }
 
+// Copy station i to the end of the track. Keeps size, places and rotation: a rotated lane station
+// keeps its angle relative to the lane it sits on. Returns null when the copy has no room left.
+export function duplicateStation(p, i) {
+  const orig = p.stations[i], c = structuredClone(orig);
+  c.badge = null;
+  let delta = 0;
+  if (c.kind === 'lane' && orig.pin) {
+    const base = layout({ ...p, stations: p.stations.map((s, k) => (k === i ? { ...s, pin: null } : s)) })[i];
+    if (base.fits) delta = norm(orig.pin.rot - base.frame.rot);
+    c.pin = null;
+  }
+  const L = layout({ ...p, stations: [...p.stations, c] }).at(-1);
+  if (!L.fits) return null;
+  if (delta) {
+    const qs = [...placedItems(c, L).map(x => x.q), L.entry, L.exit], xs = qs.map(q => q.x), ys = qs.map(q => q.y);
+    const mid = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
+    rotateStation(c, structuredClone(c), L, mid, delta);
+  }
+  return c;
+}
+
 export function material(p) {
   const n = {};
   const add = (it, k = 1) => { n[it.type] = (n[it.type] || 0) + k; };

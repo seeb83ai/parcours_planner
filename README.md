@@ -28,7 +28,7 @@ The interface is in German and English.
 - **Free editing:**
   - Drag stations, equipment and number badges. The arrow keys move the selection by 0.5 m (with Shift: 0.1 m), and Alt+drag moves it without the grid.
   - Rotate with Ctrl+drag or the ↻ handle, or by 90° with the R key. Delete with Del.
-  - Duplicate a station with Ctrl+D or ⧉. Reorder the stations by dragging their number in the list.
+  - Duplicate a station with Ctrl+D or ⧉. The copy goes to the end of the track, with the same size and rotation. Reorder the stations by dragging their number in the list.
   - Add extra equipment and change its size (mats, boxes, benches, hoops).
   - Number badges place themselves where they don't cover equipment.
 - **Formats:** a parcours, where all children run one after another, or a station circuit, where groups rotate. The circuit has a timer with a countdown and a beep at each change.
@@ -79,7 +79,7 @@ Quick start:
 | Ctrl + drag (Cmd on a Mac) | Rotate freely in 15° steps |
 | Arrow keys | Move the selection by 0.5 m (with Shift: 0.1 m) |
 | Alt + drag | Move without the 0.5 m grid |
-| Ctrl+D | Duplicate the selected station |
+| Ctrl+D | Duplicate the selected station. The copy goes to the end of the track, with the same size and rotation. When there is no room left, nothing is added. |
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Esc | Clear the selection |
 | ? | Open the help (also the **?** button at the top) |

@@ -205,13 +205,9 @@ function addItem(type) {
 }
 
 function duplicate(i) {
-  change(() => {
-    const c = structuredClone(P.stations[i]);
-    c.badge = null;
-    if (c.kind === 'lane') c.pin = null;
-    P.stations.splice(i + 1, 0, c);
-    sel = { st: i + 1 };
-  });
+  const c = M.duplicateStation(P, i);
+  if (!c) return toast(t('dup.nofit'));
+  change(() => { P.stations.push(c); sel = { st: P.stations.length - 1 }; });
 }
 
 function moveStation(from, to) {
