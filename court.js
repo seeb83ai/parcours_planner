@@ -107,6 +107,8 @@ const rotHandle = (q, attrs, title) => `<g ${attrs} style="cursor:grab"><title>$
   + `<text x="${n(q.x)}" y="${n(q.y + 0.2)}" text-anchor="middle" font-size="0.6" font-weight="700" fill="#0f766e">↻</text></g>`;
 
 // Inner SVG markup of the court. opts: { id, t, edit, sel: { st, item, free } }
+// ponytail: cut at 18 characters, a real fit check if names overlap often
+const short = s => (s = String(s ?? '').trim()).length > 18 ? s.slice(0, 17).trimEnd() + '…' : s;
 export function courtInner(p, opts) {
   const { id, t, edit, sel = {} } = opts, lay = layout(p), o = [], zirkel = p.mode === 'zirkel';
   const run = `<path d="M0 0L10 5L0 10z" fill="${COL.run}"/>`, thr = `<path d="M0 0L10 5L0 10z" fill="${COL.throw}"/>`;
@@ -169,7 +171,8 @@ export function courtInner(p, opts) {
   badges(p, lay).forEach((b, i) => {
     if (!b) return;
     o.push(`<g ${edit ? `data-drag="badge" data-st="${i}" ${cur(S === i)}` : ''}><circle cx="${n(b.x)}" cy="${n(b.y)}" r="0.65" fill="${S === i ? '#0f766e' : COL.ink}"/>`
-      + `<text x="${n(b.x)}" y="${n(b.y + 0.27)}" text-anchor="middle" font-size="0.75" font-weight="700" fill="#fff">${i + 1}</text></g>`);
+      + `<text x="${n(b.x)}" y="${n(b.y + 0.27)}" text-anchor="middle" font-size="0.75" font-weight="700" fill="#fff">${i + 1}</text>`
+      + `<text x="${n(b.x)}" y="${n(b.y + 1.15)}" text-anchor="middle" font-size="0.45" font-weight="600" fill="${COL.ink}" stroke="#fff" stroke-width="0.12" paint-order="stroke">${esc(short(p.stations[i].name))}</text><title>${esc(p.stations[i].name)}</title></g>`);
   });
   // unsafe crossings (editor only)
   if (edit) for (const c of crossings(p, lay))
