@@ -3,6 +3,7 @@ import * as M from './model.js';
 import { CATALOG, FILTERS, forAge, BLANK } from './stations.js';
 import { PRESETS, buildPreset } from './presets.js';
 import { caption } from './court.js';
+import { schedule } from './sim.js';
 
 const results = [];
 const check = (name, ok) => results.push([name, !!ok]);
@@ -21,6 +22,11 @@ const near = (a, b) => Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6;
     && p.stations[1].name === 'Mein Name' && p.stations[2].task === (e2.hard?.en ?? e2.task.en) && (!p.stations[2].variants || p.stations[2].variants.normal === e2.task.en)); }
 { const e = { ...M.emptyParcours(), stations: [M.newStation(BLANK, 'en')] }, l = M.layout(e);
   check('empty station: no equipment, fits on the lane, English name', l[0].fits && !e.stations[0].items.length && e.stations[0].name === 'Custom station' && !M.material(e).length); }
+check('simulation: every child of every template finishes, in start order', PRESETS.every(d => {
+  const p = { ...buildPreset(d, 'de'), mode: 'parcours' }, S = schedule(p), ends = S.kids.map(ph => ph[0].t0);
+  return S.kids.length === p.children && Number.isFinite(S.end) && ends.every((v, k) => !k || v > ends[k - 1])
+    && S.kids.every(ph => ph.every((x, j) => x.t1 >= x.t0 && (!j || Math.abs(x.t0 - ph[j - 1].t1) < 1e-9)));
+}));
 check('badge caption wraps at spaces, two lines at most', JSON.stringify(caption('Sprungwurf über die Bank')) === '["Sprungwurf über","die Bank"]'
   && JSON.stringify(caption('Luftballon hochhalten und fangen')) === '["Luftballon","hochhalten und…"]' && caption('Wackelberg').length === 1);
 

@@ -656,7 +656,7 @@ export const forAge = (e, g) => {
 // Catalog filter (dropdown). Works on catalog entries and on saved own stations.
 const tag = (e, t) => (e.tags || []).includes(t);
 const has = (e, ...types) => e.items.some(it => types.includes(it.type));
-const withBall = e => tag(e, 'ball') || !['movement', 'athletics'].includes(e.skill);
+export const withBall = e => tag(e, 'ball') || !['movement', 'athletics'].includes(e.skill);
 export const FILTERS = [
   { id: 'all', f: () => true },
   { group: 'ball', id: 'ball', f: withBall },

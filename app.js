@@ -3,6 +3,7 @@ import { CATALOG, FILTERS, forAge, BLANK } from './stations.js';
 const TEXTS = [...CATALOG, BLANK]; // stations whose texts follow the language
 import { PRESETS, buildPreset } from './presets.js';
 import * as M from './model.js';
+import { createSim } from './sim.js';
 import { courtInner, pageSVG, esc, stationBox, itemPlace, viewBox } from './court.js';
 
 const $ = id => document.getElementById(id);
@@ -56,6 +57,7 @@ function restore(from, to) {
 function renderCourt({ selbar = true } = {}) {
   $('court').setAttribute('viewBox', viewBox(P));
   $('court').innerHTML = courtInner(P, { id: 'ed', t, edit: true, sel });
+  if (sim?.running && P.mode === 'zirkel') simToggle(false); else sim?.changed();
   if (selbar) renderSelbar();
   renderSide();
   store.set('parcours.draft', P);
@@ -470,6 +472,16 @@ $('catalog').addEventListener('click', e => {
 $('filter').addEventListener('change', renderCatalog);
 $('palette').innerHTML = Object.keys(M.ITEM_TYPES).map(k => `<button data-type="${k}" data-i18n="item.${k}"></button>`).join('');
 $('btn-blank').addEventListener('click', () => addStation(BLANK));
+// --- simulation (parcours format only)
+const sim = createSim($('court'), () => P, t);
+function simToggle(on) {
+  if (on && P.mode === 'zirkel') { toast(t('sim.zirkel')); on = false; }
+  if (on) sim.start(); else sim.stop();
+  $('btn-sim').setAttribute('aria-pressed', on);
+  $('sim-speed').hidden = !on;
+}
+$('btn-sim').addEventListener('click', () => simToggle(!sim.running));
+$('sim-speed').addEventListener('change', e => { sim.speed = +e.target.value; });
 $('palette').addEventListener('click', e => { const b = e.target.closest('button'); if (b) addItem(b.dataset.type); });
 $('selbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) selAction(b.dataset.sact); });
 $('selbar').addEventListener('focusin', e => { if (e.target.dataset.size) begin(); });
