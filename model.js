@@ -214,7 +214,8 @@ function runLine(a, b, via, G, to) {
   const direct = { type: 'line', to, pts: [a, b] };
   if (project(a, G).d > 0.5 || project(b, G).d > 0.5) return direct;
   const lane = laneRoute(a, b, G), ll = polyLen(lane), dl = Math.hypot(b.x - a.x, b.y - a.y);
-  return ll > 3 * dl && ll - dl > 20 ? direct : { type: 'line', to, pts: lane };
+  // the run to the finish always follows the lane: with few or no stations it is a full lap
+  return to !== -1 && ll > 3 * dl && ll - dl > 20 ? direct : { type: 'line', to, pts: lane };
 }
 
 // Corners of a run line (without its end points), and setting them (undefined = automatic lane route).
