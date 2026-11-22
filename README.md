@@ -54,7 +54,7 @@ The interface is in German and English.
   - The same page as a PNG (picture symbol).
   - **Meine Parcours** (my parcours): keep several parcours in the browser.
   - Save and load the parcours as a JSON file (down and up arrows: export and import). Hover a symbol to see its name.
-  - **Aufbau** (set-up): a checklist for the phone that shows the equipment station by station.
+  - **Aufbau-Checkliste** (set-up checklist, clipboard symbol): a checklist for the phone that shows the equipment station by station.
 - **16 ready-made parcours** ("Vorlage laden"), at least 4 for each age group. The list shows only the templates for the chosen age group:
 
   | Template | Age groups |
