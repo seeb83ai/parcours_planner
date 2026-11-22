@@ -4,6 +4,15 @@ A web app for handball coaches to plan a gym parcours (obstacle course) for youn
 
 The interface is in German and English.
 
+**Online:** https://seeb83ai.github.io/parcours_planner/
+
+![The editor: catalog and equipment on the left, the court with a selected station in the middle, the station texts below](docs/editor.png)
+
+<p align="center">
+  <img src="docs/print.png" width="420" alt="Printed A4 page: the court plan, one description per station, the equipment list">
+  <br><em>The printed page (A4 portrait). The PNG export has the same layout.</em>
+</p>
+
 ## Features
 
 - **Step-by-step building:** pick a station from the catalog. It goes on a lane 2.5 m inside the walls, after the selected station.
