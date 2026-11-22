@@ -162,6 +162,10 @@ check('presets have no crossings', PRESETS.every(d => { const pp = buildPreset(d
 const bp = buildPreset(PRESETS.find(d => d.id === 'prellen-werfen'), 'de'), bl = M.layout(bp), bb = M.badges(bp, bl);
 const allItems = bp.stations.flatMap((s, i) => M.placedItems(s, bl[i]).map(c => c.q));
 check('badges keep 1 m from material', bb.every(b => allItems.every(q => Math.hypot(q.x - b.x, q.y - b.y) >= 0.99)));
+check('badge boxes (number + name) of a template never overlap', PRESETS.every(d => {
+  const p = buildPreset(d, 'en'), bs = M.badges(p, M.layout(p)).map((b, i) => b && M.badgeBox(b, p.stations[i].name)).filter(Boolean);
+  return bs.every((a, i) => bs.every((b, j) => i === j || a.x2 <= b.x1 || b.x2 <= a.x1 || a.y2 <= b.y1 || b.y2 <= a.y1));
+}));
 
 // a row adjusted by hand only stretches
 const mr = st('slalom-prellen');

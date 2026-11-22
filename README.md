@@ -38,7 +38,7 @@ The interface and the station catalog are in German and English. When you switch
   - Rotate with Ctrl+drag or the ↻ handle, or by 90° with the R key. Delete with Del.
   - Duplicate a station with Ctrl+D or ⧉. The copy goes to the end of the track, with the same size and rotation. Reorder the stations by dragging their number in the list.
   - Add extra equipment and change its size (mats, boxes, benches, hoops).
-  - Number badges place themselves where they don't cover equipment. The station name stands below each number (a long name wraps onto a second line; hover for the full name).
+  - Number badges with the station name below place themselves where they don't cover other badges, equipment, throw lines or running paths. A long name wraps onto a second line; hover for the full name.
   - **Run paths:** the runs between stations have rounded corners. Click a run to edit it like a polygon: drag its corners, drag "+" to insert a corner, and double-click or press Del to delete one. "Laufweg zurücksetzen" brings back the automatic route.
 - **Phone view:** on small screens the court stays on top. Three tabs below it show one part at a time: **Hinzufügen** (station catalog and equipment), **Stationen** (the station list with texts and details) and **Gruppe & Halle** (settings, available equipment, hints and the equipment list).
 - **Formats:** a parcours, where all children run one after another, or a station circuit, where groups rotate. The circuit has a timer with a countdown and a beep at each change.

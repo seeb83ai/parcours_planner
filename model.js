@@ -288,7 +288,8 @@ function segX(a, b, c, d) {
   const t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / den, u = ((c.x - a.x) * r.y - (c.y - a.y) * r.x) / den;
   return t > 0.02 && t < 0.98 && u > 0.02 && u < 0.98 ? { x: a.x + t * r.x, y: a.y + t * r.y } : null;
 }
-export function crossings(p, lay) {
+// Running paths and throw/pass lines of a parcours (used by the safety check and the badge placement).
+function lines(p, lay) {
   const runs = connectors(p, lay).map(c => ({ pts: samplePath(c), owner: c.type === 'curve' ? c.st : null }));
   const shots = [];
   p.stations.forEach((st, i) => {
@@ -305,7 +306,10 @@ export function crossings(p, lay) {
     }
     if (st.kind === 'goal' && st.target) shots.push({ a: L.exit, b: toWorld(L.frame, st.target.u, st.target.v), owner: i });
   });
-  const out = [];
+  return { runs, shots };
+}
+export function crossings(p, lay) {
+  const { runs, shots } = lines(p, lay), out = [];
   for (const s of shots) for (const r of runs) {
     if (r.owner === s.owner) continue; // a station's own run and throws belong together
     for (let k = 0; k + 1 < r.pts.length; k++) {
@@ -316,36 +320,64 @@ export function crossings(p, lay) {
   return out;
 }
 
-// --- Number badges: first spot near the station that is free of material and other badges.
+// --- Number badges with the station name below. Each badge takes the candidate spot near its station
+// whose box (number + caption) covers the least: other badges and leaving the court are not allowed,
+// equipment and the start box weigh most, then throw lines, then running paths.
+// Caption: words wrapped at spaces into lines of about 16 characters, at most two lines (then '…').
+export function caption(s, max = 16) {
+  const L = [];
+  for (const w of String(s ?? '').trim().split(/\s+/).filter(Boolean))
+    if (L.length && (L.at(-1) + ' ' + w).length <= max) L[L.length - 1] += ' ' + w; else L.push(w);
+  return L.length > 2 ? [L[0], L[1] + '…'] : L;
+}
+// Box of a badge at q (world metres): circle r 0.65, caption below (font 0.45, line 0.5, ~0.26 m per character).
+export function badgeBox(q, name) {
+  const L = caption(name), w = Math.max(1.3, Math.max(0, ...L.map(l => l.length)) * 0.26);
+  return { x1: q.x - w / 2, x2: q.x + w / 2, y1: q.y - 0.65, y2: q.y + (L.length ? 1.25 + 0.5 * (L.length - 1) : 0.65) };
+}
 function itemPoints(it, q, rot) {
   const T = ITEM_TYPES[it.type];
-  if (T.r) return [q];
-  const w = it.w ?? T.w, h = it.h ?? T.h, long = Math.max(w, h);
-  if (long <= 1.2) return [q];
-  const fr = { x: q.x, y: q.y, rot: rot + (h > w ? 90 : 0) }, n = Math.ceil(long);
-  return Array.from({ length: n + 1 }, (_, k) => toWorld(fr, -long / 2 + long * k / n, 0));
+  if (T.r) return [{ ...q, r: it.type === 'hoop' ? (it.size || 0.8) / 2 : T.r }];
+  const w = it.w ?? T.w, h = it.h ?? T.h, long = Math.max(w, h), r = Math.min(w, h) / 2;
+  if (long <= 1.2) return [{ ...q, r: long / 2 }];
+  const fr = { x: q.x, y: q.y, rot: rot + (h > w ? 90 : 0) }, n = Math.ceil(long / 0.5);
+  return Array.from({ length: n + 1 }, (_, k) => ({ ...toWorld(fr, -long / 2 + long * k / n, 0), r }));
 }
+const dense = (pts, step = 0.5) => pts.slice(1).flatMap((b, i) => {
+  const a = pts[i], n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / step));
+  return Array.from({ length: n }, (_, k) => ({ x: a.x + (b.x - a.x) * k / n, y: a.y + (b.y - a.y) * k / n }));
+}).concat(pts.slice(-1));
 export function badges(p, lay) {
-  const G = geom(hallOf(p)), pts = p.free.flatMap(it => itemPoints(it, it, it.rot || 0)), out = [];
+  const G = geom(hallOf(p)), items = p.free.flatMap(it => itemPoints(it, it, it.rot || 0)), out = [], boxes = [];
   p.stations.forEach((st, i) => {
-    if (lay[i].fits) placedItems(st, lay[i]).forEach(c => pts.push(...itemPoints(c.it, c.q, c.rot)));
+    if (lay[i].fits) placedItems(st, lay[i]).forEach(c => items.push(...itemPoints(c.it, c.q, c.rot)));
   });
+  if (p.mode !== 'zirkel') items.push(...dense([finishPoint(p), startExit(p)]).map(q => ({ ...q, r: 0.6 })));
+  const { runs, shots } = lines(p, lay);
+  const runPts = runs.flatMap(r => dense(r.pts)), shotPts = shots.flatMap(s => dense([s.a, s.b], 0.3));
+  const inBox = (b, q, m = 0) => q.x > b.x1 - m && q.x < b.x2 + m && q.y > b.y1 - m && q.y < b.y2 + m;
+  const cost = (b, k) => {
+    if (b.x1 < 0.2 || b.y1 < 0.2 || b.x2 > G.w - 0.2 || b.y2 > G.h - 0.2) return 1e6;
+    if (boxes.some(o => o && b.x1 < o.x2 + 0.3 && o.x1 < b.x2 + 0.3 && b.y1 < o.y2 + 0.3 && o.y1 < b.y2 + 0.3)) return 1e5;
+    return 20 * items.filter(q => inBox(b, q, q.r + 0.15)).length + 6 * shotPts.filter(q => inBox(b, q, 0.1)).length
+      + runPts.filter(q => inBox(b, q, 0.1)).length + 0.3 * k;
+  };
   p.stations.forEach((st, i) => {
     const L = lay[i];
-    if (!L.fits) return out.push(null);
-    if (st.badge) return out.push(st.badge);
-    let cands;
-    if (st.kind === 'goal') cands = [[1.4, -1.4], [1.4, 1.4], [2.4, 0], [-1.4, 1.8], [-1.4, -1.8], [3.2, -1.4]]
-      .map(([du, dv]) => toWorld(L.frame, st.action.u + du, st.action.v + dv));
-    else {
+    if (!L.fits) { boxes.push(null); return out.push(null); }
+    if (st.badge) { boxes.push(badgeBox(st.badge, st.name)); return out.push(st.badge); }
+    let cands = [];
+    if (st.kind === 'goal') {
+      for (const du of [1.6, 2.6, 3.6, 0, 4.6, -1.4]) for (const dv of [-1.6, 1.6, 0, -2.8, 2.8, -4, 4]) cands.push([st.action.u + du, st.action.v + dv]);
+    } else {
       const m = Math.max(...spotOffsets(st).map(o => o.dv)), s = span(st);
-      cands = [[s / 2, 2.4], [s / 2, 3.4], [s / 2 - 1.6, 2.4], [s / 2 + 1.6, 2.4], [s / 2, 4.4], [s / 2 - 1.6, 3.4], [s / 2 + 1.6, 3.4]]
-        .map(([u, v]) => toWorld(L.frame, u, v + m));
+      for (const v of [2.4, 3.4, 4.4, 5.6, 6.8, -1.6]) for (const du of [0, -1.6, 1.6, -3, 3]) cands.push([s / 2 + du, (v > 0 ? v + m : v)]);
     }
-    const free = q => q.x > 0.7 && q.x < G.w - 0.7 && q.y > 0.7 && q.y < G.h - 0.7
-      && pts.every(c => Math.hypot(c.x - q.x, c.y - q.y) >= 1)
-      && out.every(b => !b || Math.hypot(b.x - q.x, b.y - q.y) >= 1.5);
-    out.push(cands.find(free) || cands[0]);
+    const q = cands.map(([u, v]) => toWorld(L.frame, u, v)).map((q, k) => ({ q, c: cost(badgeBox(q, st.name), k) }))
+      .reduce((a, b) => (b.c < a.c ? b : a)).q;
+    const b = { x: r3(q.x), y: r3(q.y) };
+    out.push(b);
+    boxes.push(badgeBox(b, st.name));
   });
   return out;
 }

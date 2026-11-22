@@ -1,6 +1,6 @@
 // SVG rendering in metres: the court with all stations, and the A4 portrait print page.
 import { layout, connectors, toWorld, itemU, ITEM_TYPES, START_LEN, material, span, spotOffsets,
-  placedItems, badges, crossings, geom, hallOf, circuit, startFrame } from './model.js';
+  placedItems, badges, crossings, geom, hallOf, circuit, startFrame, caption } from './model.js';
 
 const COL = {
   floor: '#f3e9d6', line: '#a8977a', run: '#0f766e', throw: '#c2410c', ink: '#111827', start: '#15803d',
@@ -107,13 +107,7 @@ const rotHandle = (q, attrs, title) => `<g ${attrs} style="cursor:grab"><title>$
   + `<text x="${n(q.x)}" y="${n(q.y + 0.2)}" text-anchor="middle" font-size="0.6" font-weight="700" fill="#0f766e">↻</text></g>`;
 
 // Inner SVG markup of the court. opts: { id, t, edit, sel: { st, item, free } }
-// Caption under a badge: words wrapped at spaces into lines of about 16 characters, at most two lines (then '…').
-export function caption(s, max = 16) {
-  const L = [];
-  for (const w of String(s ?? '').trim().split(/\s+/).filter(Boolean))
-    if (L.length && (L.at(-1) + ' ' + w).length <= max) L[L.length - 1] += ' ' + w; else L.push(w);
-  return L.length > 2 ? [L[0], L[1] + '…'] : L;
-}
+export { caption } from './model.js';
 export function courtInner(p, opts) {
   const { id, t, edit, sel = {} } = opts, lay = layout(p), o = [], zirkel = p.mode === 'zirkel';
   const run = `<path d="M0 0L10 5L0 10z" fill="${COL.run}"/>`, thr = `<path d="M0 0L10 5L0 10z" fill="${COL.throw}"/>`;
